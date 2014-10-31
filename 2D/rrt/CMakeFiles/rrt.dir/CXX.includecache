@@ -1,0 +1,24 @@
+#IncludeRegexLine: ^[ 	]*#[ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/ry0/Desktop/RRT/2D/rrt/MotionPlan.h
+vector
+-
+ostream
+-
+string
+-
+
+/home/ry0/Desktop/RRT/2D/rrt/main.cpp
+iostream
+-
+MotionPlan.h
+/home/ry0/Desktop/RRT/2D/rrt/MotionPlan.h
+fstream
+-
+

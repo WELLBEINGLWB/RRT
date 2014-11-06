@@ -119,8 +119,8 @@ bool MotionPlan::link(const double* xMin, const double* xMax,
 
 void MotionPlan::MoveObstacle(double* xMin, double* xMax, double* yMin, double* yMax, int numObstacles, int iterations){
   for (int i = 0; i < numObstacles; ++i) { // 障害物の範囲内ならreturn false
-    yMin[i] = yMin[i] + 0.5*iterations;
-    yMax[i] = yMax[i] + 0.5*iterations;
+    yMin[i] = yMin[i] + 0.1*iterations;
+    yMax[i] = yMax[i] + 0.1*iterations;
     std::cout << "(yMin[i], yMax[i]) = (" << yMin[i] << "," << yMax[i] << ")" << std::endl;
   }
 
@@ -553,7 +553,7 @@ void MotionPlan::RRT::RRTloop(int* iterations, int* nodePath, int* pathLength, s
   //std::vector<POINT>::iterator addpath;
 
   while(1){
-    std::ofstream pathData("./plot_data/path_data.dat", std::ios_base::trunc);
+
     MoveObstacle(xMin, xMax, yMin, yMax, numObstacles, i);
     std::cout << i+1 <<"番目の探索です。" << std::endl;
     if(i>0){
@@ -570,12 +570,14 @@ void MotionPlan::RRT::RRTloop(int* iterations, int* nodePath, int* pathLength, s
           tmp.y = (nodes[nodePath[j]])->y;
           paths.push_back(tmp);
         }
+
+        std::ofstream pathData("./plot_data/path_data.dat", std::ios_base::trunc);
         for(int addpath = 0; addpath < paths.size(); addpath++ ){
           pathData << paths[addpath].x << "\t" << paths[addpath].y << std::endl;
         }
 
-        std::cout << "書き込み確認後に「y」を入力" << std::endl;
-        std::cin >> a;
+        // std::cout << "書き込み確認後に「y」を入力" << std::endl;
+        // std::cin >> a;
       } else {
         std::cout << "Path not found." << std::endl;
       }
@@ -583,8 +585,11 @@ void MotionPlan::RRT::RRTloop(int* iterations, int* nodePath, int* pathLength, s
       std::cout << "経路は全部再利用" << std::endl;
     }
 
-    std::cout << "次のステップに進む場合は「y」を入力" << std::endl;
-    std::cin >> a;
+    for(int k=0; k<60; ++k){
+      usleep(20000);
+    }
+    // std::cout << "次のステップに進む場合は「y」を入力" << std::endl;
+    // std::cin >> a;
 
     i++;
   }

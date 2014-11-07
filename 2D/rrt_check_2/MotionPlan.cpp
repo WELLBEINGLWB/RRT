@@ -29,7 +29,6 @@ bool MotionPlan::clear(const double* xMin, const double* xMax,
 
 // NONZERO SLOPE
 // 障害物のそれぞれのサイドにおいて、(y-y1)=m(x-x1)で考える。
-
 bool MotionPlan::link(const double* xMin, const double* xMax,
                       const double* yMin, const double* yMax, int numObstacles,
                       double xStart, double yStart, double xDest, double yDest)
@@ -117,7 +116,8 @@ bool MotionPlan::link(const double* xMin, const double* xMax,
 }
 
 
-void MotionPlan::MoveObstacle(double* xMin, double* xMax, double* yMin, double* yMax, int numObstacles, int iterations){
+void MotionPlan::MoveObstacle(double* xMin, double* xMax, double* yMin, double* yMax, int numObstacles, int iterations)
+{
   for (int i = 0; i < numObstacles; ++i) { // 障害物の範囲内ならreturn false
     yMin[i] = yMin[i] + 0.1*iterations;
     yMax[i] = yMax[i] + 0.1*iterations;
@@ -183,6 +183,7 @@ MotionPlan::RRT::TreeNode* MotionPlan::RRT::TreeNode::nearestNode(
   return nearest;
 }
 
+
 void MotionPlan::RRT::TreeNode::deleteChildren()
 {
   std::vector<TreeNode*>::iterator child;
@@ -213,6 +214,7 @@ xLeft(xL), xRight(xR), yTop(yT), yBottom(yB)
   srand((unsigned int)time(NULL));
 }
 
+
 MotionPlan::RRT::RRT(std::string fileName):
 root(NULL), xMin(NULL), xMax(NULL), yMin(NULL), yMax(NULL)
 {
@@ -233,7 +235,8 @@ root(NULL), xMin(NULL), xMax(NULL), yMin(NULL), yMax(NULL)
 // xStart yStart
 // xGoal yGoal
 // Stepsize
-void MotionPlan::RRT::initFromFile(std::string fileName){
+void MotionPlan::RRT::initFromFile(std::string fileName)
+{
   if (xMin != NULL)
     delete [] xMin;
   if (xMax != NULL)
@@ -264,12 +267,11 @@ void MotionPlan::RRT::initFromFile(std::string fileName){
 
   Start_and_Goal << xStart << "\t" << yStart << std::endl;
   Start_and_Goal << xGoal << "\t" << yGoal << std::endl;
-
-
-
 }
 
-MotionPlan::RRT::~RRT(){
+
+MotionPlan::RRT::~RRT()
+{
   if (root != NULL){
     root->deleteChildren();
     delete root;
@@ -287,12 +289,12 @@ MotionPlan::RRT::~RRT(){
   }
 
   if (yMin != NULL){
-    delete [] yMin;
+    delete[] yMin;
     yMin = NULL;
   }
 
-  if (yMax != NULL){
-    delete [] yMax;
+  if (yMax != NULL) {
+    delete[] yMax;
     yMax = NULL;
   }
 }
@@ -302,7 +304,8 @@ MotionPlan::RRT::~RRT(){
 // by the left/bottom value. This effectively generates x and y values
 // in [xLeft, xRight] and [yBottom,yTop], respectively. We continue
 // generating points until we find one that is clear of all obstacles.
-void MotionPlan::RRT::randFreeSample(double* x, double* y){
+void MotionPlan::RRT::randFreeSample(double* x, double* y)
+{
   int roulette;
 
   //srand((unsigned int)time(NULL));
@@ -321,7 +324,8 @@ void MotionPlan::RRT::randFreeSample(double* x, double* y){
 }
 
 // Recurses through the RRT, calling nearestNode() on each node.
-MotionPlan::RRT::TreeNode* MotionPlan::RRT::nearestNode(double x, double y){
+MotionPlan::RRT::TreeNode* MotionPlan::RRT::nearestNode(double x, double y)
+{
   TreeNode* nearest = NULL;
   double distance;
   nearest = root->nearestNode(x, y, &distance);
@@ -333,14 +337,24 @@ MotionPlan::RRT::TreeNode* MotionPlan::RRT::nearestNode(double x, double y){
 // normalizes it, and then scales it by stepSize to get our new point to add
 // to the tree, given that link() between the nearest node and the new node
 // does not fail.
-MotionPlan::RRT::TreeNode* MotionPlan::RRT::genNewNode(const TreeNode* nearest,
- double x, double y){
+MotionPlan::RRT::TreeNode* MotionPlan::RRT::genNewNode(const TreeNode* nearest, double x, double y)
+{ // x, yはサンプルポイント
   double dx = x - nearest->x;
   double dy = y - nearest->y;
-  double dist = sqrt(dx*dx + dy*dy);
+  double dist;
+  double newdist; // 新しくできたノードを結んだ距離計算用
 
+  dist = sqrt(dx*dx + dy*dy);
   double newX = nearest->x + stepSize*(dx / dist);
   double newY = nearest->y + stepSize*(dy / dist);
+
+
+  newdist = sqrt((newX-nearest->x)*(newX-nearest->x) + (newY-nearest->y)*(newY-nearest->y));
+  if(newdist > dist){
+    //std::cout << "サンプルポイントをnewNodeにしたよ。座標(" << x << ", " << y << ")" << std::endl;
+    newX = x;
+    newY = y;
+  }
 
   if (link(xMin, xMax, yMin, yMax, numObstacles, nearest->x, nearest->y, newX, newY)){
     TreeNode* newNode = new TreeNode;
@@ -353,6 +367,7 @@ MotionPlan::RRT::TreeNode* MotionPlan::RRT::genNewNode(const TreeNode* nearest,
     return NULL;
   }
 }
+
 
 // Checks if the square of the distance between this node and
 // the goal position is within the square of the stepSize. If so,
@@ -422,6 +437,8 @@ bool MotionPlan::RRT::PathCheck(int* pathLength){
 bool MotionPlan::RRT::findPath(int* iterations, int* nodePath, int* pathLength)
 {
   int i,j = 0;
+  double sampleX = 0.0, sampleY = 0.0;
+
   std::ofstream real("./plot_data/realtimedata.dat");
   std::string SamplePointNow = "./plot_data/samplenow.dat";
   std::string SamplePointNext = "./plot_data/samplenext.dat";
@@ -466,7 +483,6 @@ bool MotionPlan::RRT::findPath(int* iterations, int* nodePath, int* pathLength)
       std::cout << "iterations = " << (*iterations) << std::endl;
     }
 
-    double sampleX, sampleY;
     TreeNode* near = NULL;
     TreeNode* newNode = NULL;
 
@@ -593,7 +609,6 @@ void MotionPlan::RRT::RRTloop(int* iterations, int* nodePath, int* pathLength, s
 
     i++;
   }
-
 }
 
 

@@ -1,5 +1,5 @@
 #include "MotionPlan.h"
-//using namespace std;
+using namespace std;
 
 // (xTest, yTest)が障害物の中にあるかどうかの判定
 bool MotionPlan::clear(const double* xMin, const double* xMax,
@@ -148,8 +148,7 @@ bool MotionPlan::equal(double x, double y) { return (fabs(x - y) < EPSILON); }
 // within children's subtrees, then compares the nearest node from that
 // to the calling node's position itself. Returns nearest node and distance
 // from nearest node to sample point.
-MotionPlan::RRT::TreeNode* MotionPlan::RRT::TreeNode::nearestNode(
-    double xSample, double ySample, double* nearestDist)
+MotionPlan::RRT::TreeNode* MotionPlan::RRT::TreeNode::nearestNode(double xSample, double ySample, double* nearestDist)
 {
   (*nearestDist) = -1;
   double dist;
@@ -387,7 +386,6 @@ bool MotionPlan::RRT::checkGoal(const TreeNode* checkNode){
 bool MotionPlan::RRT::PathCheck(int* pathLength){
   bool check = true;
 
-  std::cout << yMin[0] << "," << yMax[0] << std::endl;
   for (int i = 0; i < (*pathLength)-1; ++i){
     if(link(xMin, xMax, yMin, yMax, numObstacles, paths[i].x, paths[i].y, paths[i+1].x, paths[i+1].y)){
       //問題なし
@@ -513,6 +511,7 @@ bool MotionPlan::RRT::findPath(int* iterations, int* nodePath, int* pathLength)
       // printf("(i, sampleX, sampleY) = (%d, %2.5lf, %2.5lf )\n", i, sampleX, sampleY);
       // std::cout << (nodes[edges[j].node1])->x << "\t" << (nodes[edges[j].node1])->y << std::endl;
       // std::cout << (nodes[edges[j].node2])->x << "\t" << (nodes[edges[j].node2])->y << std::endl;
+
       outputTree(real, j);
       outputTree(j);
       j++;
@@ -538,7 +537,6 @@ bool MotionPlan::RRT::findPath(int* iterations, int* nodePath, int* pathLength)
   //連打する用窓破壊！！
   //cvReleaseImage(&img);
   //cvDestroyWindow("連打用窓");
-
 
   if (goal != NULL){
     std::vector<int> reversePath;
@@ -578,24 +576,26 @@ void MotionPlan::RRT::RRTloop(int* iterations, int* nodePath, int* pathLength, s
     }
 
     if(check == false){
-      if (findPath(iterations, nodePath, pathLength)) {
-        outputTree(nodeData);
+      while(1){
+        if (findPath(iterations, nodePath, pathLength)) {
+          outputTree(nodeData);
 
-        for (int j = 0; j < (*pathLength); ++j) {
-          tmp.x = (nodes[nodePath[j]])->x;
-          tmp.y = (nodes[nodePath[j]])->y;
-          paths.push_back(tmp);
+          for (int j = 0; j < (*pathLength); ++j) {
+            tmp.x = (nodes[nodePath[j]])->x;
+            tmp.y = (nodes[nodePath[j]])->y;
+            paths.push_back(tmp);
+          }
+
+          std::ofstream pathData("./plot_data/path_data.dat", std::ios_base::trunc);
+          for(int addpath = 0; addpath < paths.size(); addpath++ ){
+            pathData << paths[addpath].x << "\t" << paths[addpath].y << std::endl;
+          }
+          // std::cout << "書き込み確認後に「y」を入力" << std::endl;
+          // std::cin >> a;
+          break;
+        } else {
+          std::cout << "Path not found." << std::endl;
         }
-
-        std::ofstream pathData("./plot_data/path_data.dat", std::ios_base::trunc);
-        for(int addpath = 0; addpath < paths.size(); addpath++ ){
-          pathData << paths[addpath].x << "\t" << paths[addpath].y << std::endl;
-        }
-
-        // std::cout << "書き込み確認後に「y」を入力" << std::endl;
-        // std::cin >> a;
-      } else {
-        std::cout << "Path not found." << std::endl;
       }
     }else{
       std::cout << "経路は全部再利用" << std::endl;

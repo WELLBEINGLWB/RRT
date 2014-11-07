@@ -322,13 +322,23 @@ MotionPlan::RRT::TreeNode* MotionPlan::RRT::nearestNode(double x, double y){
 // to the tree, given that link() between the nearest node and the new node
 // does not fail.
 MotionPlan::RRT::TreeNode* MotionPlan::RRT::genNewNode(const TreeNode* nearest,
- double x, double y){
+ double x, double y){ // x, yはサンプルポイント
   double dx = x - nearest->x;
   double dy = y - nearest->y;
-  double dist = sqrt(dx*dx + dy*dy);
+  double dist;
+  double newdist; // 新しくできたノードを結んだ距離計算用
 
+  dist = sqrt(dx*dx + dy*dy);
   double newX = nearest->x + stepSize*(dx / dist);
   double newY = nearest->y + stepSize*(dy / dist);
+
+
+  newdist = sqrt((newX-nearest->x)*(newX-nearest->x) + (newY-nearest->y)*(newY-nearest->y));
+  if(newdist > dist){
+    //std::cout << "サンプルポイントをnewNodeにしたよ。座標(" << x << ", " << y << ")" << std::endl;
+    newX = x;
+    newY = y;
+  }
 
   if (link(xMin, xMax, yMin, yMax, numObstacles, nearest->x, nearest->y, newX, newY)){
     TreeNode* newNode = new TreeNode;

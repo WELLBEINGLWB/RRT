@@ -6,11 +6,11 @@
 
 #IncludeRegexTransform: 
 
-/home/ry0/Desktop/RRT/2D/rrt_check/MotionPlan.cpp
+/home/ry0/Documents/git/RRT/2D/rrt_check/MotionPlan.cpp
 MotionPlan.h
-/home/ry0/Desktop/RRT/2D/rrt_check/MotionPlan.h
+/home/ry0/Documents/git/RRT/2D/rrt_check/MotionPlan.h
 
-/home/ry0/Desktop/RRT/2D/rrt_check/MotionPlan.h
+/home/ry0/Documents/git/RRT/2D/rrt_check/MotionPlan.h
 iostream
 -
 ostream

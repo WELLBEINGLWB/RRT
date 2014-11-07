@@ -6,7 +6,11 @@
 
 #IncludeRegexTransform: 
 
-/home/ry0/Desktop/RRT/2D/rrt_check_2/MotionPlan.h
+/home/ry0/Documents/git/RRT/2D/rrt_check_2/MotionPlan.cpp
+MotionPlan.h
+/home/ry0/Documents/git/RRT/2D/rrt_check_2/MotionPlan.h
+
+/home/ry0/Documents/git/RRT/2D/rrt_check_2/MotionPlan.h
 iostream
 -
 ostream
@@ -28,7 +32,7 @@ ctime
 unistd.h
 -
 
-/home/ry0/Desktop/RRT/2D/rrt_check_2/main.cpp
+/home/ry0/Documents/git/RRT/2D/rrt_check_2/main.cpp
 MotionPlan.h
-/home/ry0/Desktop/RRT/2D/rrt_check_2/MotionPlan.h
+/home/ry0/Documents/git/RRT/2D/rrt_check_2/MotionPlan.h
 

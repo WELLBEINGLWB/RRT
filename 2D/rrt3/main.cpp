@@ -11,7 +11,7 @@ int main(int argc, char* argv[])
   int nodeSum = 0;
   int itersSum = 0;
 
-  MotionPlan::RRT rrt("./plot_data/testcase1.dat");
+  MotionPlan::RRT rrt("./plot_data/testcase2o.dat");
 
   std::ofstream file("./plot_data/data.dat");
 

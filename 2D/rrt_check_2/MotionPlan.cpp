@@ -119,8 +119,15 @@ bool MotionPlan::link(const double* xMin, const double* xMax,
 void MotionPlan::MoveObstacle(double* xMin, double* xMax, double* yMin, double* yMax, int numObstacles, int iterations)
 {
   for (int i = 0; i < numObstacles; ++i) { // 障害物の範囲内ならreturn false
-    yMin[i] = yMin[i] + 0.1*iterations;
-    yMax[i] = yMax[i] + 0.1*iterations;
+    if(i == 0){
+      yMin[i] = yMin[i] + 0.1*iterations;
+      yMax[i] = yMax[i] + 0.1*iterations;
+    }else if(i == 1){
+      yMin[i] = yMin[i] - 0.1*iterations;
+      yMax[i] = yMax[i] - 0.1*iterations;
+    }else{
+      //そのまま
+    }
     std::cout << "(yMin[i], yMax[i]) = (" << yMin[i] << "," << yMax[i] << ")" << std::endl;
   }
 
@@ -392,9 +399,9 @@ bool MotionPlan::RRT::PathCheck(int* pathLength){
       check = true;
     }else{
       std::cout << "以前の作成した軌道じゃダメ。再計算" << std::endl;
-      xStart = paths[i].x;
-      yStart = paths[i].y;
-      paths.erase(paths.begin()+i, paths.end());
+      xStart = paths[i-2].x;
+      yStart = paths[i-2].y;
+      paths.erase(paths.begin()+i-2, paths.end());
       check = false;
       break;
     }

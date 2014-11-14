@@ -150,6 +150,7 @@ void MotionPlan::MoveObstacle(double* xMin, double* xMax, double* yMin, double* 
 
 bool MotionPlan::equal(double x, double y) { return (fabs(x - y) < EPSILON); }
 
+
 // First recurses through child nodes to find nearest node to xSample and
 // ySample
 // within children's subtrees, then compares the nearest node from that
@@ -185,7 +186,6 @@ MotionPlan::RRT::TreeNode* MotionPlan::RRT::TreeNode::nearestNode(double xSample
     nearest = this;
     (*nearestDist) = dist;
   }
-
   return nearest;
 }
 
@@ -227,6 +227,7 @@ root(NULL), xMin(NULL), xMax(NULL), yMin(NULL), yMax(NULL)
   initFromFile(fileName);
   srand((unsigned int)time(NULL));
 }
+
 
 // Reads initialization info for this RRT from a file with the
 // following format:
@@ -305,6 +306,7 @@ MotionPlan::RRT::~RRT()
   }
 }
 
+
 // For x and y, generates a random number, scales it to [0,1], then
 // scales it to the distance between the boundaries, then offsets it
 // by the left/bottom value. This effectively generates x and y values
@@ -329,6 +331,7 @@ void MotionPlan::RRT::randFreeSample(double* x, double* y)
 
 }
 
+
 // Recurses through the RRT, calling nearestNode() on each node.
 MotionPlan::RRT::TreeNode* MotionPlan::RRT::nearestNode(double x, double y)
 {
@@ -338,6 +341,7 @@ MotionPlan::RRT::TreeNode* MotionPlan::RRT::nearestNode(double x, double y)
 
   return nearest;
 }
+
 
 // Finds the vector from the nearest node to the sample point (x,y),
 // normalizes it, and then scales it by stepSize to get our new point to add
@@ -639,6 +643,7 @@ void MotionPlan::RRT::outputTree(std::ostream &outStream, int iterations)
   outStream << (nodes[edges[iterations].node2])->x << "\t" << (nodes[edges[iterations].node2])->y << std::endl;
   outStream << "\n" << std::endl;
 }
+
 
 void MotionPlan::RRT::outputTree(int iterations)
 {

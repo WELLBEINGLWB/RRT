@@ -9,14 +9,9 @@ int main(int argc, char* argv[])
   MotionPlan::RRT rrt("./plot_data/testcase2o.dat");
 
   std::ofstream file("./plot_data/data.dat");
-
   std::ofstream path_file("./plot_data/path_data.dat");
 
-
   rrt.RRTloop(&iters, path, &pathLength, file);
-
-  file.close();
-  path_file.close();
 
   return 0;
 }

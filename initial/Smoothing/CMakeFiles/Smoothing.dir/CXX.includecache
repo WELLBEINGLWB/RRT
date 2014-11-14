@@ -1,0 +1,36 @@
+#IncludeRegexLine: ^[ 	]*#[ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/ry0/Documents/git/RRT/initial/Smoothing/function.cpp
+function.h
+/home/ry0/Documents/git/RRT/initial/Smoothing/function.h
+
+/home/ry0/Documents/git/RRT/initial/Smoothing/function.h
+iostream
+-
+ostream
+-
+fstream
+-
+string
+-
+vector
+-
+iterator
+-
+cmath
+-
+ctime
+-
+cstdlib
+-
+
+/home/ry0/Documents/git/RRT/initial/Smoothing/main.cpp
+function.h
+/home/ry0/Documents/git/RRT/initial/Smoothing/function.h
+

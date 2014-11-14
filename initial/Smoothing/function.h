@@ -39,6 +39,7 @@ class Smoothing
             int numObstacles, double xStart, double yStart, double xDest, double yDest);
   int GetRandom(double min, double max);
   void PrintData();
+  void PrintObstacle();
   void smoothing();
 
  private:

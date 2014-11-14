@@ -167,8 +167,19 @@ int Smoothing::GetRandom(double min, double max)
 
 void Smoothing::PrintData()
 {
+  // for (unsigned int i = 0; i < paths.size(); i++) {
+  //   cout << "( " << i << ", " << paths[i].x << ", " << paths[i].y << " )" << endl;
+  // }
   for (unsigned int i = 0; i < paths.size(); i++) {
-    cout << "( " << i << ", " << paths[i].x << ", " << paths[i].y << " )" << endl;
+    cout << paths[i].x << "\t" << paths[i].y << endl;
+  }
+}
+
+void Smoothing::PrintObstacle()
+{
+  for (int i = 0; i < numObstacles; i++) {
+    cout << "障害物" << i << "( xMin[i] = " << xMin[i] << ", xMax[i] = " << xMax[i] <<
+                             "\nyMin[i] = " << yMin[i] << ", yMax[i] = " << yMax[i]<< endl;
   }
 }
 
@@ -177,7 +188,7 @@ void Smoothing::smoothing()
   int SamplePoint[2];
   int tmp;
 
-  for (int i = 0; i < 10; ++i) {
+  for (int i = 0; i < 50000; ++i) {
     while (1) {
       for (int j = 0; j < 2; ++j) {
         SamplePoint[j] = Smoothing::GetRandom(0, paths.size() - 1);
@@ -196,7 +207,7 @@ void Smoothing::smoothing()
 
     if(link(xMin, xMax, yMin, yMax, numObstacles,
             paths[SamplePoint[0]].x, paths[SamplePoint[0]].y,
-            paths[SamplePoint[1]].x, paths[SamplePoint[1]].x)){
+            paths[SamplePoint[1]].x, paths[SamplePoint[1]].y)){
       cout << SamplePoint[0] << "と" << SamplePoint[1] << "の間の点はグッバイ！" << endl;
       cout << "グッバイしたあとのpathの長さは" << paths.size() << "です。" << endl;
       paths.erase(paths.begin()+SamplePoint[0]+1, paths.begin()+SamplePoint[1]);

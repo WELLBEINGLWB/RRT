@@ -1,0 +1,38 @@
+#IncludeRegexLine: ^[ 	]*#[ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/ry0/Documents/git/RRT/3D/rrt6/MotionPlan.h
+iostream
+-
+fstream
+-
+ostream
+-
+iterator
+-
+vector
+-
+string
+-
+cmath
+-
+cstdlib
+-
+ctime
+-
+unistd.h
+-
+
+/home/ry0/Documents/git/RRT/3D/rrt6/main.cpp
+iostream
+-
+fstream
+-
+MotionPlan.h
+/home/ry0/Documents/git/RRT/3D/rrt6/MotionPlan.h
+

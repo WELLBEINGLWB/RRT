@@ -448,12 +448,12 @@ bool MotionPlan::RRT::findPath(int* iterations, int* nodePath, int* pathLength)
     outputSample(SamplePointNext, sampleX, sampleY);
 
     //ステップを進める用のキーボード入力待ち
-    if((*iterations) > 0){
-      cvNamedWindow("連打用窓",CV_WINDOW_AUTOSIZE);
-      cvShowImage("連打用窓",img);
-      std::cout << (*iterations)+1 << "ループ目に進む" << std::endl;
-      cvWaitKey(0);
-    }
+    // if((*iterations) > 0){
+    //   cvNamedWindow("連打用窓",CV_WINDOW_AUTOSIZE);
+    //   cvShowImage("連打用窓",img);
+    //   std::cout << (*iterations)+1 << "ループ目に進む" << std::endl;
+    //   cvWaitKey(0);
+    // }
     // while (1) {
     //   // マウスの左クリックを離すまでの間、矩形を一時的に描画
     //   if (click_flag) {

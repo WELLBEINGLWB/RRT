@@ -13,15 +13,14 @@
 #include <ctime>
 #include <cstdlib>
 
+#include <unistd.h>
+
 using namespace std;
 
-
-typedef struct
-{
+typedef struct{
   double x;
   double y;
 } POINT;
-
 
 class Smoothing
 {
@@ -32,6 +31,7 @@ class Smoothing
   void initFromFile(std::string fileName);
   int CountNumbersOfTextLines(std::string fileName);
   void Input_Data(std::string fileName);
+  double Distance();
   bool equal(double x, double y);
   bool clear(const double* xMin, const double* xMax, const double* yMin, const double* yMax,
              int numObstacles, double xTest, double yTest);
@@ -39,8 +39,10 @@ class Smoothing
             int numObstacles, double xStart, double yStart, double xDest, double yDest);
   int GetRandom(double min, double max);
   void PrintData();
+  void OutputData();
   void PrintObstacle();
-  void smoothing();
+  void smoothing(int loop);
+  void onestep_smoothing(int loop);
 
  private:
   int data_num;

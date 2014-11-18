@@ -66,6 +66,21 @@ void Smoothing::Input_Data(std::string fileName)
   input.close();
 }
 
+double Smoothing::Distance()
+{
+  double dis = 0.0;
+  if(paths.size() == 0){
+    cout << "パスのデータが存在しません。" << endl;
+    return -1;
+  }else{
+    for (unsigned int i = 0; i < paths.size()-1; ++i) {
+      dis += sqrt(pow(paths[i+1].x - paths[i].x, 2) + pow(paths[i+1].y - paths[i].y, 2));
+    }
+    // cout << "パスの距離は" << dis << "です。" << endl;
+    return dis;
+  }
+}
+
 bool Smoothing::equal(double x, double y) { return (fabs(x - y) < EPSILON); }
 
 bool Smoothing::clear(const double* xMin, const double* xMax, const double* yMin,
@@ -175,44 +190,96 @@ void Smoothing::PrintData()
   }
 }
 
-void Smoothing::PrintObstacle()
+void Smoothing::OutputData()
 {
-  for (int i = 0; i < numObstacles; i++) {
-    cout << "障害物" << i << "( xMin[i] = " << xMin[i] << ", xMax[i] = " << xMax[i] <<
-                             "\nyMin[i] = " << yMin[i] << ", yMax[i] = " << yMax[i]<< endl;
+  ofstream output("./plot_data/path_data_mod.dat");
+
+  for (unsigned int i = 0; i < paths.size(); i++) {
+    output << paths[i].x << "\t" << paths[i].y << endl;
   }
 }
 
-void Smoothing::smoothing()
+void Smoothing::PrintObstacle()
+{
+  for (int i = 0; i < numObstacles; i++) {
+    cout << "障害物" << i+1 << " ( xMin[" << i << "] = " << xMin[i] << ", xMax[" << i << "] = " << xMax[i] <<
+    "\n          yMin[" << i << "] = " << yMin[i] << ", yMax[" << i << "] = " << yMax[i] << " )" << endl;
+  }
+}
+
+void Smoothing::smoothing(int loop)
 {
   int SamplePoint[2];
   int tmp;
+  double ini ,current, old = 0.0;
 
-  for (int i = 0; i < 50000; ++i) {
+  ini = Distance();
+  cout << "初期のパスの距離は" << ini << endl;
+  for (int i = 0; i < loop; ++i){
     while (1) {
       for (int j = 0; j < 2; ++j) {
         SamplePoint[j] = Smoothing::GetRandom(0, paths.size() - 1);
       }
-      if (SamplePoint[0] > SamplePoint[1]) {
+      if (SamplePoint[0] > SamplePoint[1] && SamplePoint[0] != SamplePoint[1] + 1) {
         tmp = SamplePoint[0];
         SamplePoint[0] = SamplePoint[1];
         SamplePoint[1] = tmp;
         break;
-      } else if (SamplePoint[0] < SamplePoint[1]) {
+      } else if (SamplePoint[0] < SamplePoint[1] && SamplePoint[0] + 1 != SamplePoint[1]) {
         break;
-      }else{
+      } else {
         //もう一回引き直し(ΦωΦ)
       }
     }
 
-    if(link(xMin, xMax, yMin, yMax, numObstacles,
-            paths[SamplePoint[0]].x, paths[SamplePoint[0]].y,
-            paths[SamplePoint[1]].x, paths[SamplePoint[1]].y)){
+    if (link(xMin, xMax, yMin, yMax, numObstacles,
+             paths[SamplePoint[0]].x, paths[SamplePoint[0]].y,
+             paths[SamplePoint[1]].x, paths[SamplePoint[1]].y)){
       cout << SamplePoint[0] << "と" << SamplePoint[1] << "の間の点はグッバイ！" << endl;
       cout << "グッバイしたあとのpathの長さは" << paths.size() << "です。" << endl;
       paths.erase(paths.begin()+SamplePoint[0]+1, paths.begin()+SamplePoint[1]);
+
+      std::ofstream outStream("./plot_data/path_data_mod.dat", std::ios_base::trunc);
+      for (unsigned int k = 0; k < paths.size(); k++) {
+        outStream << paths[k].x << "\t" << paths[k].y << endl;
+      }
+      for (int k = 0; k < 100; ++k){
+        usleep(10000);
+      }
+
+
+      current = Distance();
+      cout << "現在のパスの総距離は" << current << endl;
+      // if( (ini - current) > 7){
+      //   cout << "しきい値以下になりました！" << endl;
+      //   break;
+      // }
+      if(fabs(old - current) < 0.0000001){
+        cout << "しきい値以下になりました！" << endl;
+        break;
+      }
+      old = current;
     }
 
+  }
+  //PrintData();
+}
+
+void Smoothing::onestep_smoothing(int loop)
+{
+  int SamplePoint[2];
+
+  for (int i = 0; i < loop; ++i){
+    SamplePoint[0] = Smoothing::GetRandom(0, paths.size() - 2);
+    SamplePoint[1] = SamplePoint[0] + 2;
+
+    if (link(xMin, xMax, yMin, yMax, numObstacles,
+             paths[SamplePoint[0]].x, paths[SamplePoint[0]].y,
+             paths[SamplePoint[1]].x, paths[SamplePoint[1]].y)){
+      cout << SamplePoint[0] << "と" << SamplePoint[1] << "の間の点はグッバイ！" << endl;
+      cout << "グッバイしたあとのpathの長さは" << paths.size() << "です。" << endl;
+      paths.erase(paths.begin()+SamplePoint[0]+1);
+    }
   }
   PrintData();
 }

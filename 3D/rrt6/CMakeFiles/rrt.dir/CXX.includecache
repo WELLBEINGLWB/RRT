@@ -6,6 +6,10 @@
 
 #IncludeRegexTransform: 
 
+/home/ry0/Documents/git/RRT/3D/rrt6/MotionPlan.cpp
+MotionPlan.h
+/home/ry0/Documents/git/RRT/3D/rrt6/MotionPlan.h
+
 /home/ry0/Documents/git/RRT/3D/rrt6/MotionPlan.h
 iostream
 -
@@ -27,12 +31,4 @@ ctime
 -
 unistd.h
 -
-
-/home/ry0/Documents/git/RRT/3D/rrt6/main.cpp
-iostream
--
-fstream
--
-MotionPlan.h
-/home/ry0/Documents/git/RRT/3D/rrt6/MotionPlan.h
 

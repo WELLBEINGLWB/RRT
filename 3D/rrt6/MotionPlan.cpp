@@ -98,6 +98,12 @@ bool MotionPlan::link(const double* xMin, const double* xMax,
 
   A.x = xStart; A.y = yStart; A.z = zStart;
   B.x = xDest ; B.y = yDest ; B.z = zDest;
+
+  if (!clear(xMin, xMax, yMin, yMax, zMin, zMax, numObstacles, xStart, yStart, zStart) ||
+      !clear(xMin, xMax, yMin, yMax, zMin, zMax, numObstacles, xDest, yDest, zDest)) {
+    return false;
+  }
+
   Pcompare(A, B, compare);
 
   // 平面と直線の交点を導出 (参考サイト：http://www.hiramine.com/programming/graphics/3d_planesegmentintersection.html)
@@ -624,9 +630,9 @@ void MotionPlan::RRT::smoothing(int loop)
       for (unsigned int k = 0; k < paths.size(); k++) {
         outStream << paths[k].x << "\t" << paths[k].y << "\t" << paths[k].z << std::endl;
       }
-      for (int k = 0; k < 100; ++k){
-        usleep(10000);
-      }
+      // for (int k = 0; k < 100; ++k){
+      //   usleep(10000);
+      // }
 
       current = Distance();
       std::cout << "現在のパスの総距離は" << current << std::endl;
@@ -650,7 +656,6 @@ void MotionPlan::RRT::smoothing(int loop)
     }
 
   }
-  //PrintData();
   printf("グッバイする前のパスの総距離は%5.3lf\n", ini);
   printf("        した後のパスの総距離は%5.3lf\n", Distance());
 }
@@ -661,6 +666,8 @@ void MotionPlan::RRT::CreateCube(std::ostream &cube)
 {
   RANGE obstacle;
   std::ofstream plot("./plot_data/start_goal.dat");
+  std::ofstream pathinit("./plot_data/path_data.dat", std::ios_base::trunc);
+  std::ofstream smoothData("./plot_data/path_data_mod.dat", std::ios_base::trunc);
 
   for(int ob = 0; ob < numObstacles; ++ob){
     obstacle.xrange[0] = xMin[ob]; obstacle.yrange[0] = yMin[ob]; obstacle.zrange[0] = zMin[ob];
@@ -686,6 +693,12 @@ void MotionPlan::RRT::CreateCube(std::ostream &cube)
   plot << xStart << "\t" << yStart << "\t" << zStart << std::endl;
   plot << xGoal << "\t" << yGoal << "\t" << zGoal << std::endl;
 
+  pathinit << xStart << "\t" << yStart << std::endl;
+  pathinit << xStart << "\t" << yStart << std::endl;
+
+  smoothData << xStart << "\t" << yStart << std::endl;
+  smoothData << xStart << "\t" << yStart << std::endl;
+
 }
 
 
@@ -698,9 +711,9 @@ void MotionPlan::RRT::outputTree(std::ostream &outStream)
     outStream << (nodes[edges[i].node2])->x << "\t" << (nodes[edges[i].node2])->y << "\t" << (nodes[edges[i].node2])->z << std::endl;
     outStream << "\n" << std::endl;
 
-    for (int k = 0; k < 100; ++k){
-      usleep(100);
-    }
+    // for (int k = 0; k < 100; ++k){
+    //   usleep(100);
+    // }
 
   }
 }
@@ -720,9 +733,9 @@ void MotionPlan::RRT::outputTree(FILE *outStream)
     fflush(outStream);
 
 
-    for(int k=0; k<50; ++k){
-      usleep(10000);
-    }
+    // for(int k=0; k<50; ++k){
+    //   usleep(10000);
+    // }
 
   }
 }

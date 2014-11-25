@@ -1,33 +1,6 @@
 #ifndef _MOTION_PLAN_H_
 #define _MOTION_PLAN_H_
-
-#include <iostream>
-#include <fstream>
-#include <ostream>
-
-#include <iterator>
-#include <vector>
-#include <string>
-
-#include <cmath>
-#include <cstdlib>
-#include <ctime>
-
-#include <unistd.h>
-
-using namespace std;
-typedef struct{
-  double x;
-  double y;
-  double z;
-} POINT;
-
-typedef struct {
-  double xrange[2];
-  double yrange[2];
-  double zrange[2];
-} RANGE;
-
+#include "RRTStruct.h"
 
 namespace MotionPlan
 {
@@ -167,7 +140,7 @@ namespace MotionPlan
     /// Displays the RRT's nodes and edges.
     void outputTree(std::ostream& outStream);
     void outputTree(FILE *outStream);
-    void gnuplot_config(FILE *outStream);
+    void OutputFinalPath(std::vector<POINT> *finalpath);
 
     /// Pointer to the root (start) node of the RRT.
     TreeNode* root;

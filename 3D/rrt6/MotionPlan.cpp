@@ -596,11 +596,13 @@ void MotionPlan::RRT::smoothing(int loop)
   int SamplePoint[2];
   int tmp;
   double ini;
+  int initPathNum;
   double current, old = 0.0;
   int count = 0;
 
   ini = Distance();
-  std::cout << "初期のパスの距離は" << ini << std::endl;
+  initPathNum = paths.size();
+  //std::cout << "初期のパスの距離は" << ini << std::endl;
 
   for (int i = 0; i < loop; ++i){
     while (1) {
@@ -622,8 +624,8 @@ void MotionPlan::RRT::smoothing(int loop)
     if (link(xMin, xMax, yMin, yMax, zMin, zMax, numObstacles,
              paths[SamplePoint[0]].x, paths[SamplePoint[0]].y, paths[SamplePoint[0]].z,
              paths[SamplePoint[1]].x, paths[SamplePoint[1]].y, paths[SamplePoint[1]].z)){
-      std::cout << SamplePoint[0] << "と" << SamplePoint[1] << "の間の点はグッバイ！" << std::endl;
-      std::cout << i+1 << "ループ目、グッバイしたあとのpathの長さは" << paths.size() << "です。" << std::endl;
+      //std::cout << SamplePoint[0] << "と" << SamplePoint[1] << "の間の点はグッバイ！" << std::endl;
+      //std::cout << i+1 << "ループ目、グッバイしたあとのpathの長さは" << paths.size() << "です。" << std::endl;
       paths.erase(paths.begin()+SamplePoint[0]+1, paths.begin()+SamplePoint[1]);
 
       std::ofstream outStream("./plot_data/path_data_mod.dat", std::ios_base::trunc);
@@ -635,11 +637,8 @@ void MotionPlan::RRT::smoothing(int loop)
       // }
 
       current = Distance();
-      std::cout << "現在のパスの総距離は" << current << std::endl;
-      // if( (ini - current) > 7){
-      //   cout << "しきい値以下になりました！" << endl;
-      //   break;
-      // }
+      //std::cout << "現在のパスの総距離は" << current << std::endl;
+
       if( fabs(old - current) < 0.001 ){
         std::cout << count + 1 << "回目、しきい値以下になりました！" << std::endl;
         count++;
@@ -652,12 +651,14 @@ void MotionPlan::RRT::smoothing(int loop)
       }
 
     }else{
-      std::cout << i+1 << "ループ目はグッバイできませんでした。" << std::endl;
+      // std::cout << i+1 << "ループ目はグッバイできませんでした。" << std::endl;
     }
 
   }
   printf("グッバイする前のパスの総距離は%5.3lf\n", ini);
   printf("        した後のパスの総距離は%5.3lf\n", Distance());
+  printf("グッバイする前のパスの総数は %3d\n", initPathNum);
+  printf("        した後のパスの総数は %3ld\n", paths.size());
 }
 
 
@@ -742,19 +743,8 @@ void MotionPlan::RRT::outputTree(FILE *outStream)
 
 
 
-void MotionPlan::RRT::gnuplot_config(FILE *outStream)
-{
-
-  outStream = popen("gnuplot -persist", "w");    /*プログラムが終了後GnuplotのWindowを閉じない*/
-  //outStream = popen("gnuplot", "w");               /*プログラムが終了後GnuplotのWindowを閉じる*/
-  fprintf(outStream,"set terminal gif animate optimize size \n");
-  fprintf(outStream,"set output 'anime.gif'\n");
-
-  /*アニメーションをgif動画として保存する場合は，上のコメントを解除*/
-  fprintf(outStream,"set xtics 0.5\n");
-  fprintf(outStream,"set ytics 0.5\n");
-  fprintf(outStream,"set xlabel 'x' font 'Times, 20'\n");
-  fprintf(outStream,"set ylabel 'y' font 'Times, 20'\n");
-  fprintf(outStream,"set grid\n");
-  fprintf(outStream,"set size square\n");
+void MotionPlan::RRT::OutputFinalPath(std::vector<POINT> *finalpath){
+  std::cout << "copy" << std::endl;
+  finalpath->resize(paths.size());
+  copy(paths.begin(), paths.end(), finalpath->begin());
 }

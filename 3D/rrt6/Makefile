@@ -111,6 +111,30 @@ rrt/fast:
 	$(MAKE) -f CMakeFiles/rrt.dir/build.make CMakeFiles/rrt.dir/build
 .PHONY : rrt/fast
 
+Bspline.o: Bspline.cpp.o
+.PHONY : Bspline.o
+
+# target to build an object file
+Bspline.cpp.o:
+	$(MAKE) -f CMakeFiles/rrt.dir/build.make CMakeFiles/rrt.dir/Bspline.cpp.o
+.PHONY : Bspline.cpp.o
+
+Bspline.i: Bspline.cpp.i
+.PHONY : Bspline.i
+
+# target to preprocess a source file
+Bspline.cpp.i:
+	$(MAKE) -f CMakeFiles/rrt.dir/build.make CMakeFiles/rrt.dir/Bspline.cpp.i
+.PHONY : Bspline.cpp.i
+
+Bspline.s: Bspline.cpp.s
+.PHONY : Bspline.s
+
+# target to generate assembly for a file
+Bspline.cpp.s:
+	$(MAKE) -f CMakeFiles/rrt.dir/build.make CMakeFiles/rrt.dir/Bspline.cpp.s
+.PHONY : Bspline.cpp.s
+
 MotionPlan.o: MotionPlan.cpp.o
 .PHONY : MotionPlan.o
 
@@ -168,6 +192,9 @@ help:
 	@echo "... edit_cache"
 	@echo "... rebuild_cache"
 	@echo "... rrt"
+	@echo "... Bspline.o"
+	@echo "... Bspline.i"
+	@echo "... Bspline.s"
 	@echo "... MotionPlan.o"
 	@echo "... MotionPlan.i"
 	@echo "... MotionPlan.s"

@@ -5,5 +5,5 @@ ADD_DEFINITIONS(
 )
 project( rrt )
 
-add_executable( rrt main.cpp MotionPlan.cpp )
+add_executable( rrt main.cpp MotionPlan.cpp Bspline.cpp )
 target_link_libraries( rrt )

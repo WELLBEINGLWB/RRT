@@ -1,6 +1,5 @@
 #ifndef RRT_STRUCT_H_
 #define RRT_STRUCT_H_
-
 #include <iostream>
 #include <fstream>
 #include <ostream>

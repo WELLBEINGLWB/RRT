@@ -9,6 +9,7 @@ void drowSpline(std::vector<POINT> &finalpath)
   double *x = new double[num];
   double *y = new double[num];
   double *z = new double[num];
+
   for (int i = 0; i < num; ++i){
     x[i] = finalpath[i].x;
     y[i] = finalpath[i].y;
@@ -73,8 +74,13 @@ double Spline::calc(double t)
 {
   int j;
   double dt;
+
   j = (int)floor(t); // 小数点以下切捨て
-  if(j < 0) j=0; else if (j >= num) j=num-1; // 丸め誤差を考慮
+  if(j < 0){
+    j=0;
+  } else if (j >= num){
+    j=num-1; // 丸め誤差を考慮
+  }
 
   dt = t - (double)j;
   return a[j] + ( b[j] + (c[j] + d[j] * dt) * dt ) * dt;

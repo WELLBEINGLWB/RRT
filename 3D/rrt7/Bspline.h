@@ -1,5 +1,5 @@
 #include "RRTStruct.h"
-#define MaxSplineSize 100
+#define MaxSplineSize 500
 
 void drowSpline(std::vector<POINT> &finalpath);
 class Spline

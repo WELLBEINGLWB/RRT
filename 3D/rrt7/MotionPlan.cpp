@@ -283,6 +283,16 @@ void MotionPlan::RRT::initFromFile(std::string fileName)
   input >> xStart >> yStart >> zStart >> xGoal >> yGoal >> zGoal >> stepSize;
 
   input.close();
+
+  printf("\nフィールドの定義域は: x[%5.2lf, %5.2lf] y[%5.2lf, %5.2lf] z[%5.2lf, %5.2lf]\n", xLeft, xRight, yBottom, yTop, zBottom, zTop);
+
+  cout << "障害物リスト" << endl;
+  for (int i = 0; i < numObstacles; ++i){
+    printf("             障害物%d: x[%5.2lf, %5.2lf] y[%5.2lf, %5.2lf] z[%5.2lf, %5.2lf]\n", i+1, xMin[i], xMax[i], yMin[i], yMax[i], zMin[i], zMax[i]);
+  }
+
+  printf("\nスタートとゴール    : Start[%5.2lf, %5.2lf, %5.2lf]\n", xStart, yStart, zStart);
+  printf("                        End[%5.2lf, %5.2lf, %5.2lf]\n\n", xGoal, yGoal, zGoal);
 }
 
 
@@ -605,6 +615,9 @@ void MotionPlan::RRT::smoothing(int loop)
   //std::cout << "初期のパスの距離は" << ini << std::endl;
 
   for (int i = 0; i < loop; ++i){
+    if(paths.size()==2){ // もしパスの長さが2だったらもう間引けないからブレイク
+      break;
+    }
     while (1) {
       for (int j = 0; j < 2; ++j) {
         SamplePoint[j] = GetRandom(0, paths.size() - 1);
@@ -617,7 +630,7 @@ void MotionPlan::RRT::smoothing(int loop)
       } else if (SamplePoint[0] < SamplePoint[1] && SamplePoint[0] + 1 != SamplePoint[1]) {
         break;
       } else {
-        //もう一回引き直し(ΦωΦ)
+        //cout << "もう一回引き直し(ΦωΦ)" << endl;
       }
     }
 
@@ -645,13 +658,13 @@ void MotionPlan::RRT::smoothing(int loop)
       }
       old = current;
 
-      if(count >= 5){
+      if(count >= 3){
         std::cout << "我慢ならん！ブレイクだ！！" << std::endl;
         break;
       }
 
     }else{
-      // std::cout << i+1 << "ループ目はグッバイできませんでした。" << std::endl;
+       //std::cout << i+1 << "ループ目はグッバイできませんでした。" << std::endl;
     }
 
   }
@@ -743,8 +756,9 @@ void MotionPlan::RRT::outputTree(FILE *outStream)
 
 
 
-void MotionPlan::RRT::OutputFinalPath(std::vector<POINT> *finalpath){
-  std::cout << "copy" << std::endl;
+void MotionPlan::RRT::OutputFinalPath(std::vector<POINT> *finalpath)
+{
+  //std::cout << "copy" << std::endl;
   finalpath->resize(paths.size());
   copy(paths.begin(), paths.end(), finalpath->begin());
 }

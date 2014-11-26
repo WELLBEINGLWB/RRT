@@ -1,1 +1,0 @@
-/usr/bin/c++       CMakeFiles/Smoothing.dir/main.cpp.o CMakeFiles/Smoothing.dir/function.cpp.o  -o Smoothing -rdynamic 

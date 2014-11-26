@@ -6,7 +6,7 @@ int main(int argc, char* argv[])
   int path[1024];
   int pathLength;
 
-  MotionPlan::RRT rrt("./plot_data/testcase3.dat");
+  MotionPlan::RRT rrt("./plot_data/testcase1.dat");
 
   std::ofstream file("./plot_data/data.dat");
   //std::ofstream path_file("./plot_data/path_data.dat");

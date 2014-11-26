@@ -577,7 +577,7 @@ void MotionPlan::RRT::RRTloop(int* iterations, int* nodePath, int* pathLength, s
       std::cout << "Path not found." << std::endl;
     }
   }
-  smoothing(100000);
+  smoothing(100);
 
 }
 
@@ -646,9 +646,9 @@ void MotionPlan::RRT::smoothing(int loop)
       for (unsigned int k = 0; k < paths.size(); k++) {
         outStream << paths[k].x << "\t" << paths[k].y << std::endl;
       }
-      for (int k = 0; k < 100; ++k){
-        usleep(10000);
-      }
+      // for (int k = 0; k < 100; ++k){
+      //   usleep(10000);
+      // }
 
       current = Distance();
       std::cout << "現在のパスの総距離は" << current << std::endl;
@@ -686,9 +686,9 @@ void MotionPlan::RRT::outputTree(std::ostream &outStream)
     outStream << (nodes[edges[i].node2])->x << "\t" << (nodes[edges[i].node2])->y << std::endl;
     outStream << "\n" << std::endl;
 
-    for (int k = 0; k < 100; ++k){
-      usleep(100);
-    }
+    // for (int k = 0; k < 100; ++k){
+    //   usleep(100);
+    // }
 
   }
 }

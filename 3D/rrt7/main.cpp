@@ -27,14 +27,20 @@ int main(int argc, char* argv[])
   MotionPlan::RRT rrt(filename);
   std::ofstream file("./plot_data/data.dat");
 
+
+  #ifndef PlotAnimation
   struct timeval start, end;
   gettimeofday(&start, NULL);
+  #endif
+
   rrt.RRTloop(&iters, path, &pathLength, file);
   rrt.OutputFinalPath(&finalpath);
   drowSpline(finalpath);
-  gettimeofday(&end, NULL);
 
+  #ifndef PlotAnimation
+  gettimeofday(&end, NULL);
   cout << "RRTの実行時間は " << (end.tv_sec - start.tv_sec) + (end.tv_usec - start.tv_usec)*1.0E-6 << "[s]でした。" << endl;
+  #endif
 
   return 0;
 }

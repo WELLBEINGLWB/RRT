@@ -7,6 +7,9 @@ set ylabel "y"
 set zlabel "z"
 set ticslevel 0
 
+set key outside
+set key top right
+
 splot "testcase1_obstacle.dat" using 1:2:3 with lines lt rgb "#ff0033" title 'Obstacle',\
 'data.dat' using 1:2:3 with lines lt rgb "#696969" lw 2 title "Node",\
 'start_goal.dat' using 1:2:3 with points pt 7 ps 2 lt rgb "#ff9900" title "Start & Goal",\

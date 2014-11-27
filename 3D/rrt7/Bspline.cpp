@@ -26,6 +26,11 @@ void drowSpline(std::vector<POINT> &finalpath)
 
   for (t = 0; t <= m; t += 0.01){
     outStream << xs.calc(t) << "\t" << ys.calc(t) << "\t" << zs.calc(t) << std::endl;
+    #ifdef PlotAnimation
+    for (int k = 0; k < 100; ++k){
+      usleep(50);
+    }
+    #endif
   }
 }
 

@@ -645,9 +645,12 @@ void MotionPlan::RRT::smoothing(int loop)
       for (unsigned int k = 0; k < paths.size(); k++) {
         outStream << paths[k].x << "\t" << paths[k].y << "\t" << paths[k].z << std::endl;
       }
-      // for (int k = 0; k < 100; ++k){
-      //   usleep(10000);
-      // }
+
+      #ifdef PlotAnimation
+      for (int k = 0; k < 1000; ++k){
+        usleep(1000);
+      }
+      #endif
 
       current = Distance();
       //std::cout << "現在のパスの総距離は" << current << std::endl;
@@ -655,6 +658,8 @@ void MotionPlan::RRT::smoothing(int loop)
       if( fabs(old - current) < 0.001 ){
         std::cout << count + 1 << "回目、しきい値以下になりました！" << std::endl;
         count++;
+      } else {
+        count = 0;
       }
       old = current;
 
@@ -682,6 +687,7 @@ void MotionPlan::RRT::CreateCube(std::ostream &cube)
   std::ofstream plot("./plot_data/start_goal.dat");
   std::ofstream pathinit("./plot_data/path_data.dat", std::ios_base::trunc);
   std::ofstream smoothData("./plot_data/path_data_mod.dat", std::ios_base::trunc);
+  std::ofstream splineData("./plot_data/Bspline.dat", std::ios_base::trunc);
 
   for(int ob = 0; ob < numObstacles; ++ob){
     obstacle.xrange[0] = xMin[ob]; obstacle.yrange[0] = yMin[ob]; obstacle.zrange[0] = zMin[ob];
@@ -704,14 +710,20 @@ void MotionPlan::RRT::CreateCube(std::ostream &cube)
       }
     }
   }
+
   plot << xStart << "\t" << yStart << "\t" << zStart << std::endl;
   plot << xGoal << "\t" << yGoal << "\t" << zGoal << std::endl;
 
-  pathinit << xStart << "\t" << yStart << std::endl;
-  pathinit << xStart << "\t" << yStart << std::endl;
+  #ifdef PlotAnimation
+  pathinit << xStart << "\t" << yStart << zStart << std::endl;
+  pathinit << xStart << "\t" << yStart << zStart << std::endl;
 
-  smoothData << xStart << "\t" << yStart << std::endl;
-  smoothData << xStart << "\t" << yStart << std::endl;
+  smoothData << xStart << "\t" << yStart << zStart << std::endl;
+  smoothData << xStart << "\t" << yStart << zStart << std::endl;
+
+  splineData << xStart << "\t" << yStart << zStart << std::endl;
+  splineData << xStart << "\t" << yStart << zStart << std::endl;
+  #endif
 
 }
 
@@ -725,9 +737,11 @@ void MotionPlan::RRT::outputTree(std::ostream &outStream)
     outStream << (nodes[edges[i].node2])->x << "\t" << (nodes[edges[i].node2])->y << "\t" << (nodes[edges[i].node2])->z << std::endl;
     outStream << "\n" << std::endl;
 
-    // for (int k = 0; k < 100; ++k){
-    //   usleep(100);
-    // }
+    #ifdef PlotAnimation
+    for (int k = 0; k < 100; ++k){
+      usleep(100);
+    }
+    #endif
 
   }
 }

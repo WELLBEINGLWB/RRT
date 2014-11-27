@@ -15,8 +15,10 @@
 #include <ctime>
 
 #include <sys/time.h>
-
 #include <unistd.h>
+
+#define PlotAnimation
+
 using namespace std;
 
 typedef struct{

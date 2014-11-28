@@ -566,7 +566,7 @@ void MotionPlan::RRT::RRTloop(int* iterations, int* nodePath, int* pathLength, s
       std::cout << "Path not found." << std::endl;
     }
   }
-  smoothing(100);
+  smoothing(200);
 
 }
 
@@ -605,6 +605,7 @@ void MotionPlan::RRT::smoothing(int loop)
 {
   int SamplePoint[2];
   int tmp;
+  int i;
   double ini;
   int initPathNum;
   double current, old = 0.0;
@@ -614,11 +615,11 @@ void MotionPlan::RRT::smoothing(int loop)
   initPathNum = paths.size();
   //std::cout << "初期のパスの距離は" << ini << std::endl;
 
-  for (int i = 0; i < loop; ++i){
+  for (i = 0; i < loop; ++i){
     if(paths.size()==2){ // もしパスの長さが2だったらもう間引けないからブレイク
       break;
     }
-    while (1) {
+    while (1) { // ランダムサンプリングの2点を抽出
       for (int j = 0; j < 2; ++j) {
         SamplePoint[j] = GetRandom(0, paths.size() - 1);
       }
@@ -629,11 +630,12 @@ void MotionPlan::RRT::smoothing(int loop)
         break;
       } else if (SamplePoint[0] < SamplePoint[1] && SamplePoint[0] + 1 != SamplePoint[1]) {
         break;
-      } else {
+      }// else {
         //cout << "もう一回引き直し(ΦωΦ)" << endl;
-      }
+      // }
     }
 
+    // 2点を結んだ直線の干渉チェック
     if (link(xMin, xMax, yMin, yMax, zMin, zMax, numObstacles,
              paths[SamplePoint[0]].x, paths[SamplePoint[0]].y, paths[SamplePoint[0]].z,
              paths[SamplePoint[1]].x, paths[SamplePoint[1]].y, paths[SamplePoint[1]].z)){
@@ -652,27 +654,28 @@ void MotionPlan::RRT::smoothing(int loop)
       }
       #endif
 
-      current = Distance();
-      //std::cout << "現在のパスの総距離は" << current << std::endl;
+    } // else {
+       // std::cout << i+1 << "ループ目はグッバイできませんでした。" << std::endl;
+    // }
+    current = Distance();
+    //std::cout << "現在のパスの総距離は" << current << " 1ループ前のパスの総距離は" << old << std::endl;
 
-      if( fabs(old - current) < 0.001 ){
-        std::cout << count + 1 << "回目、しきい値以下になりました！" << std::endl;
-        count++;
-      } else {
-        count = 0;
-      }
-      old = current;
+    if( fabs(old - current) == 0.0 ){
+      //std::cout << count + 1 << "回目、しきい値以下になりました！" << std::endl;
+      count++;
+    } else {
+      //std::cout << "ブレイクカウントをリセット" << std::endl;
+      count = 0;
+    }
 
-      if(count >= 3){
-        std::cout << "我慢ならん！ブレイクだ！！" << std::endl;
-        break;
-      }
-
-    }else{
-       //std::cout << i+1 << "ループ目はグッバイできませんでした。" << std::endl;
+    old = current;
+    if(count >= 10){
+      //std::cout << "我慢ならん！ブレイクだ！！" << std::endl;
+      break;
     }
 
   }
+  std::cout << i << "ループで終了" << std::endl;
   printf("グッバイする前のパスの総距離は%5.3lf\n", ini);
   printf("        した後のパスの総距離は%5.3lf\n", Distance());
   printf("グッバイする前のパスの総数は %3d\n", initPathNum);

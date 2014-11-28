@@ -17,7 +17,7 @@
 #include <sys/time.h>
 #include <unistd.h>
 
-#define PlotAnimation
+// #define PlotAnimation
 
 using namespace std;
 

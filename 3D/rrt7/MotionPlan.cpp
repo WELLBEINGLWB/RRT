@@ -515,8 +515,7 @@ bool MotionPlan::RRT::findPath(int* iterations, int* nodePath, int* pathLength)
 
 
   } // end while goal hasn't been reached
-
-  std::cout << "iterations = " << (*iterations) << " Finished" << std::endl;
+  printf("RRTは    %5dループで終了\n", (*iterations));
 
   if (goal != NULL){
 
@@ -619,6 +618,7 @@ void MotionPlan::RRT::smoothing(int loop)
     if(paths.size()==2){ // もしパスの長さが2だったらもう間引けないからブレイク
       break;
     }
+
     while (1) { // ランダムサンプリングの2点を抽出
       for (int j = 0; j < 2; ++j) {
         SamplePoint[j] = GetRandom(0, paths.size() - 1);
@@ -675,9 +675,10 @@ void MotionPlan::RRT::smoothing(int loop)
     }
 
   }
-  std::cout << i << "ループで終了" << std::endl;
-  printf("グッバイする前のパスの総距離は%5.3lf\n", ini);
-  printf("        した後のパスの総距離は%5.3lf\n", Distance());
+  printf("平滑化は %5dループで終了\n\n", i);
+  printf("グッバイする前のパスの総距離は %5.3lf\n", ini);
+  printf("        した後のパスの総距離は %5.3lf\n", Distance());
+  printf("                               %5.3lf%%のダイエットに成功\n", (ini-Distance())/ini*100);
   printf("グッバイする前のパスの総数は %3d\n", initPathNum);
   printf("        した後のパスの総数は %3ld\n", paths.size());
 }

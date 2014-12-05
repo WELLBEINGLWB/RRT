@@ -548,10 +548,10 @@ void MotionPlan::RRT::RRTloop(int* iterations, int* nodePath, int* pathLength, s
     if (findPath(iterations, nodePath, pathLength)) {
       outputTree(nodeData);
 
-      for (int j = 0; j < (*pathLength); ++j) {
-        tmp.x = (nodes[nodePath[j]])->x;
-        tmp.y = (nodes[nodePath[j]])->y;
-        tmp.z = (nodes[nodePath[j]])->z;
+      for (int i = 0; i < (*pathLength); ++i) {
+        tmp.x = (nodes[nodePath[i]])->x;
+        tmp.y = (nodes[nodePath[i]])->y;
+        tmp.z = (nodes[nodePath[i]])->z;
         paths.push_back(tmp);
       }
 
@@ -565,7 +565,7 @@ void MotionPlan::RRT::RRTloop(int* iterations, int* nodePath, int* pathLength, s
       std::cout << "Path not found." << std::endl;
     }
   }
-  smoothing(200);
+  smoothing(1000);
 
 }
 

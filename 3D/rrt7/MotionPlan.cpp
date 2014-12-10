@@ -556,7 +556,7 @@ void MotionPlan::RRT::RRTloop(int* iterations, int* nodePath, int* pathLength, s
       }
 
       std::ofstream pathData("./plot_data/path_data.dat", std::ios_base::trunc);
-      for(int addpath = 0; addpath < paths.size(); addpath++ ){
+      for(unsigned int addpath = 0; addpath < paths.size(); addpath++ ){
         pathData << paths[addpath].x << "\t" << paths[addpath].y << "\t" << paths[addpath].z << std::endl;
       }
       break;
@@ -565,7 +565,7 @@ void MotionPlan::RRT::RRTloop(int* iterations, int* nodePath, int* pathLength, s
       std::cout << "Path not found." << std::endl;
     }
   }
-  smoothing(1000);
+  smoothing(10000);
 
 }
 
@@ -736,7 +736,7 @@ void MotionPlan::RRT::CreateCube(std::ostream &cube)
 void MotionPlan::RRT::outputTree(std::ostream &outStream)
 {
   //ノードの座標を2点ずつのブロックでファイルに書き込み
-  for (int i = 0; i < edges.size(); ++i){
+  for (unsigned int i = 0; i < edges.size(); ++i){
     outStream << (nodes[edges[i].node1])->x << "\t" << (nodes[edges[i].node1])->y << "\t" << (nodes[edges[i].node1])->z << std::endl;
     outStream << (nodes[edges[i].node2])->x << "\t" << (nodes[edges[i].node2])->y << "\t" << (nodes[edges[i].node2])->z << std::endl;
     outStream << "\n" << std::endl;
@@ -754,7 +754,7 @@ void MotionPlan::RRT::outputTree(std::ostream &outStream)
 
 void MotionPlan::RRT::outputTree(FILE *outStream)
 {
-  for (int i = 0; i < edges.size(); ++i){
+  for (unsigned int i = 0; i < edges.size(); ++i){
     std::cout << i << "番目のループだよ" << std::endl;
     //fprintf(outStream, "plot '-' using 1:2 with lines");
 

@@ -25,6 +25,7 @@ int main(int argc, char* argv[])
   }
 
   MotionPlan::RRT rrt(filename);
+  Draw Sp(rrt);
   std::ofstream file("./plot_data/data.dat");
 
 
@@ -35,7 +36,8 @@ int main(int argc, char* argv[])
 
   rrt.RRTloop(&iters, path, &pathLength, file);
   rrt.OutputFinalPath(&finalpath);
-  drowSpline(finalpath);
+
+  Sp.drowSpline(finalpath);
 
   #ifndef PlotAnimation
   gettimeofday(&end, NULL);

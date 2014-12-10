@@ -1,42 +1,7 @@
 #include "Bspline.h"
 
-// Ｂスプライン描画
-// x[num], y[num], z[num] は座標の配列
-void drowSpline(std::vector<POINT> &finalpath)
-{
-  int num = 0;
-  num = finalpath.size();
-  double *x = new double[num];
-  double *y = new double[num];
-  double *z = new double[num];
-
-  for (int i = 0; i < num; ++i){
-    x[i] = finalpath[i].x;
-    y[i] = finalpath[i].y;
-    z[i] = finalpath[i].z;
-  }
-
-  Spline xs, ys, zs;
-  double t, m;
-  xs.init(x, num);
-  ys.init(y, num);
-  zs.init(z, num);
-  m = (double)(num - 1);
-  std::ofstream outStream("./plot_data/Bspline.dat");
-
-  for (t = 0; t <= m; t += 0.01){
-    outStream << xs.calc(t) << "\t" << ys.calc(t) << "\t" << zs.calc(t) << std::endl;
-
-    #ifdef PlotAnimation
-    for (int k = 0; k < 100; ++k){
-      usleep(50);
-    }
-    #endif
-  }
-}
-
 //スプラインデータ初期化
-void Spline::init(double *sp, int spnum)
+void Draw::Spline::init(double *sp, int spnum)
 {
   double tmp, w[MaxSplineSize + 1];
   int i;
@@ -75,8 +40,9 @@ void Spline::init(double *sp, int spnum)
   }
 }
 
+
 //媒介変数(0～num-1の実数）に対する値を計算
-double Spline::calc(double t)
+double Draw::Spline::calc(double t)
 {
   int j;
   double dt;
@@ -91,3 +57,119 @@ double Spline::calc(double t)
   dt = t - (double)j;
   return a[j] + ( b[j] + (c[j] + d[j] * dt) * dt ) * dt;
 }
+
+
+Draw::Draw(MotionPlan::RRT &rrt)
+{
+  CreatePotentialField(rrt);
+}
+
+// void Draw::initFromFile(std::string fileName)
+// {
+//   if (xMin != NULL)
+//     delete [] xMin;
+//   if (xMax != NULL)
+//     delete [] xMax;
+//   if (yMin != NULL)
+//     delete [] yMin;
+//   if (yMax != NULL)
+//     delete [] yMax;
+//   if (zMin != NULL)
+//     delete [] zMin;
+//   if (zMax != NULL)
+//     delete [] zMax;
+
+//   std::ifstream input(fileName.c_str());
+
+//   input >> xLeft >> xRight >> yBottom >> yTop >> zBottom >> zTop >> numObstacles;
+
+//   xMin = new double[numObstacles];
+//   xMax = new double[numObstacles];
+//   yMin = new double[numObstacles];
+//   yMax = new double[numObstacles];
+//   zMin = new double[numObstacles];
+//   zMax = new double[numObstacles];
+
+//   for (int i = 0; i < numObstacles; ++i){
+//     input >> xMin[i] >> xMax[i] >> yMin[i] >> yMax[i] >> zMin[i] >> zMax[i];
+//   }
+
+//   input >> xStart >> yStart >> zStart >> xGoal >> yGoal >> zGoal >> stepSize;
+
+//   input.close();
+// }
+void Draw::CreatePotentialField(MotionPlan::RRT &rrt)
+{
+  POINT tmp;
+  cout << "ポテンシャル場の作成" << endl;
+  for (int i = 0; i < rrt.numObstacles; ++i){
+    for(double x = rrt.xMin[i]; x < rrt.xMax[i]; x += 1) {
+      for(double y = rrt.yMin[i]; y < rrt.yMax[i]; y += 1){
+        for(double z = rrt.zMin[i]; z < rrt.zMax[i]; z += 1){
+          tmp.x = x; tmp.y = y; tmp.z = z;
+          vobstacle.push_back(tmp);
+        }
+      }
+    }
+  }
+}
+
+
+// f(x,y)
+double Draw::f_xyz(double x,double y, double z)
+{
+  double sum = 0.0;
+
+  for (size_t i = 0, size = vobstacle.size(); i < size; ++i){
+    sum += K*exp(-r_1*pow(x-vobstacle[i].x, 2) - r_2*pow(y-vobstacle[i].y, 2) - r_3*pow(z-vobstacle[i].z, 2));
+  }
+
+  return sum;
+}
+
+
+// Ｂスプライン描画
+// x[num], y[num], z[num] は座標の配列
+void Draw::drowSpline(std::vector<POINT> &finalpath)
+{
+  double PotentialSum = 0.0;
+  double t, m;
+  POINT tmp;
+  Spline xs, ys, zs;
+
+  num = finalpath.size();
+  x = new double[num];
+  y = new double[num];
+  z = new double[num];
+
+  for (int i = 0; i < num; ++i){
+    x[i] = finalpath[i].x;
+    y[i] = finalpath[i].y;
+    z[i] = finalpath[i].z;
+  }
+
+  xs.init(x, num);
+  ys.init(y, num);
+  zs.init(z, num);
+
+  m = (double)(num - 1);
+  std::ofstream outStream("./plot_data/Bspline.dat");
+  std::ofstream outdata("./plot_data/Potential.dat");
+
+  for (t = 0; t <= m; t += 0.01){
+    tmp.x = xs.calc(t); tmp.y = ys.calc(t); tmp.z = zs.calc(t);
+    PotentialSum += f_xyz(tmp.x, tmp.y, tmp.z);
+    SplinePoint.push_back(tmp);
+    outStream << tmp.x << "\t" << tmp.y << "\t" << tmp.z << std::endl;
+    outdata << tmp.x << "\t" << tmp.y << "\t" << tmp.z << "\t" << f_xyz(tmp.x, tmp.y, tmp.z) << std::endl;
+
+    #ifdef PlotAnimation
+    for (int k = 0; k < 100; ++k){
+      usleep(50);
+    }
+    #endif
+  }
+  cout << "平滑化後の経路のポテンシャルの合計 = " << PotentialSum << endl;
+
+}
+

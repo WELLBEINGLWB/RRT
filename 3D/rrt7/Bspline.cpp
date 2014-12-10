@@ -64,48 +64,16 @@ Draw::Draw(MotionPlan::RRT &rrt)
   CreatePotentialField(rrt);
 }
 
-// void Draw::initFromFile(std::string fileName)
-// {
-//   if (xMin != NULL)
-//     delete [] xMin;
-//   if (xMax != NULL)
-//     delete [] xMax;
-//   if (yMin != NULL)
-//     delete [] yMin;
-//   if (yMax != NULL)
-//     delete [] yMax;
-//   if (zMin != NULL)
-//     delete [] zMin;
-//   if (zMax != NULL)
-//     delete [] zMax;
 
-//   std::ifstream input(fileName.c_str());
-
-//   input >> xLeft >> xRight >> yBottom >> yTop >> zBottom >> zTop >> numObstacles;
-
-//   xMin = new double[numObstacles];
-//   xMax = new double[numObstacles];
-//   yMin = new double[numObstacles];
-//   yMax = new double[numObstacles];
-//   zMin = new double[numObstacles];
-//   zMax = new double[numObstacles];
-
-//   for (int i = 0; i < numObstacles; ++i){
-//     input >> xMin[i] >> xMax[i] >> yMin[i] >> yMax[i] >> zMin[i] >> zMax[i];
-//   }
-
-//   input >> xStart >> yStart >> zStart >> xGoal >> yGoal >> zGoal >> stepSize;
-
-//   input.close();
-// }
 void Draw::CreatePotentialField(MotionPlan::RRT &rrt)
 {
   POINT tmp;
+
   cout << "ポテンシャル場の作成" << endl;
   for (int i = 0; i < rrt.numObstacles; ++i){
-    for(double x = rrt.xMin[i]; x < rrt.xMax[i]; x += 1) {
-      for(double y = rrt.yMin[i]; y < rrt.yMax[i]; y += 1){
-        for(double z = rrt.zMin[i]; z < rrt.zMax[i]; z += 1){
+    for(double x = rrt.xMin[i]; x < rrt.xMax[i]; ++x) {
+      for(double y = rrt.yMin[i]; y < rrt.yMax[i]; ++y){
+        for(double z = rrt.zMin[i]; z < rrt.zMax[i];  ++z){
           tmp.x = x; tmp.y = y; tmp.z = z;
           vobstacle.push_back(tmp);
         }
@@ -172,4 +140,3 @@ void Draw::drowSpline(std::vector<POINT> &finalpath)
   cout << "平滑化後の経路のポテンシャルの合計 = " << PotentialSum << endl;
 
 }
-

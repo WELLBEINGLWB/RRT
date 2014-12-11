@@ -24,8 +24,8 @@ int main(int argc, char* argv[])
     return -1;
   }
 
-  MotionPlan::RRT rrt(filename);
-  Draw Sp(rrt);
+  MotionPlan::RRT rrt(filename); // RRTの計算クラス
+  Draw Sp(rrt); // B-splineの計算、APFチェックのクラス
   std::ofstream file("./plot_data/data.dat");
 
 

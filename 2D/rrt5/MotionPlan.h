@@ -2,33 +2,23 @@
 #define _MOTION_PLAN_H_
 #include "RRTStruct.h"
 
+#define Threshold 30
+
 namespace MotionPlan
 {
   /// Checks whether a point (xTest,yTest) is in collision
-  /// with any of the obstacles defined by their min/max coordinates.aaaa
-  bool clear(const double* xMin, const double* xMax,
-             const double* yMin, const double* yMax,
-             int numObstacles,
-             double xTest, double yTest);
+  /// with any of the obstacles defined by their min/max coordinates.
+  bool clear(double xTest, double yTest, std::vector<POINT> &vobstacle);
 
   /// A geometrically exact query for whether the line between
   /// points (xStart,yStart) and (xDest,yDest) collides with any
   /// of the obstacles defined by their mein/max coordinates
-  bool link(const double* xMin, const double* xMax,
-            const double* yMin, const double* yMax,
-            int numObstacles,
-            double xStart, double yStart,
-            double xDest, double yDest);
+  bool link(double xStart, double yStart,
+            double xDest, double yDest,
+            std::vector<POINT> &vobstacle);
 
-  /// Used in link for dividing cases based on whether the line
-  /// between them is of zero, infinite, or general slope
-  enum LineType {HORIZONTAL, VERTICAL, GENERAL};
+  double f_xy(double x,double y, std::vector<POINT> &vobstacle);
 
-  /// Used in equality check between two double values
-  const double EPSILON = 1e-9;
-
-  /// Check whether two double values are equal
-  bool equal(double x, double y);
 
   class RRT
   {
@@ -77,6 +67,9 @@ namespace MotionPlan
     /// Initializes the RRT as above, except uses data from a file to do so.
     RRT(std::string fileName);
 
+    /// ポテンシャル場の定義
+    void CreatePotentialField();
+
     /// Destructor
     ~RRT();
 
@@ -122,7 +115,7 @@ namespace MotionPlan
     /// Write out information about the tree into outStream.
     /// Displays the RRT's nodes and edges.
     void outputTree(std::ostream& outStream);
-    void outputTree(FILE *outStream);
+    void output_plt(string plt_output);
     void OutputFinalPath(std::vector<POINT> *finalpath);
 
     /// Pointer to the root (start) node of the RRT.
@@ -163,6 +156,9 @@ namespace MotionPlan
 
     /// RRTの最終的な経路の座標データ
     std::vector<POINT> paths;
+
+    /// ポテンシャル場を形成するための障害物点を定義するようベクター
+    std::vector<POINT> vobstacle;
 
     /// Maximum number of iterations to run when finding a path
     /// before givin up.

@@ -2,143 +2,74 @@
 
 /// Simple iterates over each object in the space
 /// and checks whether the test point lies inside the obstacle.
-bool MotionPlan::clear(const double* xMin, const double* xMax,
-                       const double* yMin, const double* yMax,
-                       int numObstacles,
-                       double xTest, double yTest){
-  for (int i = 0; i < numObstacles; ++i){
-    if (xTest >= xMin[i] && xTest <= xMax[i] && yTest >= yMin[i] && yTest <= yMax[i]){
-      return false;
-    }
+bool MotionPlan::clear(double xTest, double yTest, std::vector<POINT> &vobstacle){
+  if(f_xy(xTest, yTest, vobstacle) > Threshold){
+    return false;
+  }else{
+    return true;
   }
-
-  return true;
 }
 
-// First finds line between (xStart,yStart) and (xDest,yDest), called
-// 'link-line'.
-// Then, for each obstacle, we perform 1 of 3 different checks depending
-// on whether the line is of zero, infinite, or nonzero slope.
-// 最初に(xStart,yStart)と(xDest,yDest)の間の線を見つける。'link-line'と呼ぶよ。
-// それぞれの障害物において、'link-line'が0、無限か有限なのかどうかの依存をチェック。
 
 
-// VERTICAL/HORIZONTAL
-// If either of the endpoints of link-line is inside the obstacle, collision.
-// For vertical: for link-line x = a, if x is between xMin and xMax of
-// the obstacle, and the endpoints of the link-line lie on either side of
-// the obstacle, collision.
-// For horizontal: for link-line y = a, if y is between yMin and yMax of the
-// obstacle, and the endpoints of the link-line lie on either side of the
-// obstacle, collision.
-// Otherwise, no collision.
-// 水平/垂直
-// link-lineの終端のどちらかが障害物か衝突の中にある場合、
-// 水平の場合、link-lineはx = aで、もしxが障害物のxMinとxMaxの範囲内やまたがっていたら...
-// 垂直の場合、link-lineはy = aで、.....垂直と一緒
-// その他の場合なら障害物とあたってない！
+bool MotionPlan::link(double xStart, double yStart,
+                      double xDest, double yDest,
+                      std::vector<POINT> &vobstacle)
+{
+  double dx = xDest - xStart;
+  double dy = yDest - yStart;
+  double dist = sqrt(dx * dx + dy * dy);
+  double stepSize = 0.1;
 
+  double CheckX;
+  double CheckY;
 
-// NONZERO SLOPE
-// For each side of the obstacle, we use (y-y1)=m(x-x1) to find
-// the point of intersection of link-line and the line that runs
-// through the side of the obstacle (called side-line).
-// If that intersection point lies on the side of the obstacle, we then
-// check whether our start and dest points lie on either side of side-line.
-// If so, we have a collision. In any case besides the one defined here,
-// there is no collision.
-// 障害物のそれぞれのサイドにおいて、(y-y1)=m(x-x1)で考える。
+  double Potential;
+  double MaxPotential = 0.0;
+  // POINT MaxPoint;
+  // bool flag = true;
+  std::ofstream outStream("./plot_data/PotentialData.dat");
 
-bool MotionPlan::link(const double* xMin, const double* xMax,
-                      const double* yMin, const double* yMax,
-                      int numObstacles,
-                      double xStart, double yStart,
-                      double xDest, double yDest){
-  if (!clear(xMin, xMax, yMin, yMax, numObstacles, xStart, yStart) ||
-      !clear(xMin, xMax, yMin, yMax, numObstacles, xDest, yDest)){
+  if (!clear(xStart, yStart, vobstacle) ||
+      !clear(xDest, yDest, vobstacle)) {
+    //std::cout << "スタートとゴールが障害物内" << std::endl;
     return false;
   }
 
-  double dx = xDest - xStart;
-  double dy = yDest - yStart;
-  double m = 0.0;
-  LineType lineType = GENERAL;
+  for(double length = 0.0; length < dist; length += 0.1*stepSize){
+    CheckX = xStart + length * (dx / dist);
+    CheckY = yStart + length * (dy / dist);
+    Potential = f_xy(CheckX, CheckY, vobstacle);
+    outStream << CheckX << "\t" << CheckY << "\t" << Potential << std::endl;
 
-  if (MotionPlan::equal(dx,0))
-    lineType = VERTICAL;
-  else if (MotionPlan::equal(dy,0))
-    lineType = HORIZONTAL;
-  else
-    m = dy/dx;
-
-  for (int i = 0; i < numObstacles; ++i){
-    if (lineType == VERTICAL){
-      if (xDest >= xMin[i] && xDest <= xMax[i]){
-       if ((yStart >= yMin[i] && yStart <= yMax[i]) ||
-         (yDest >= yMin[i] && yDest <= yMax[i]) ||
-         (yStart <= yMin[i] && yDest >= yMax[i]) ||
-         (yDest <= yMin[i] && yStart >= yMax[i])){
-         return false;
-        }
-      }
+    if (Potential > MaxPotential) {  // 経路中でもっとも高いポテンシャルを計算（最大値計算）
+      MaxPotential = Potential;
+      // MaxPoint.x = CheckX;
+      // MaxPoint.y = CheckY;
     }
 
-    else if (lineType == HORIZONTAL){
-      if (yDest >= yMin[i] && yDest <= yMax[i]){
-        if ((xStart >= xMin[i] && xStart <= xMax[i]) ||
-          (xDest >= xMin[i] && xDest <= xMax[i]) ||
-          (xStart <= xMin[i] && xDest >= xMax[i]) ||
-          (xDest <= xMin[i] && xStart >= xMax[i])){
-          return false;
-        }
-      }
-    }
-
-    else { // General line case (slope != 0 and finite)
-           // Check for intersection with left side of obstacle
-      double y = yStart + m*(xMin[i] - xStart);
-      if (y >= yMin[i] && y <= yMax[i]){
-        if ((xMin[i] >= xStart && xMin[i] <= xDest) ||
-            (xMin[i] >= xDest && xMin[i] <= xStart)){
-          return false;
-        }
-      }
-
-      // Check for intersection with right side of obstacle
-      y = yStart + m*(xMax[i] - xStart);
-      if (y >= yMin[i] && y <= yMax[i]){
-        if ((xMax[i] >= xStart && xMax[i] <= xDest) ||
-          (xMax[i] >= xDest && xMax[i] <= xStart)){
-          return false;
-        }
-      }
-
-      // Check for intersection with bottom of obstacle
-      double x = (yMin[i] - yStart)/m + xStart;
-      if (x >= xMin[i] && x <= xMax[i]){
-        if ((yMin[i] >= yStart && yMin[i] <= yDest) ||
-         (yMin[i] >= yDest && yMin[i] <= yStart)){
-          return false;
-        }
-      }
-
-      // Check for intersection with top of obstacle
-      x = (yMax[i] - yStart)/m + xStart;
-      if (x >= xMin[i] && x <= xMax[i]){
-        if ((yMax[i] >= yStart && yMax[i] <= yDest) ||
-         (yMax[i] >= yDest && yMax[i] <= yStart)){
-         return false;
-        }
-      }
-    }
   }
-
-  return true;
+  // std::cout << "MaxPotential = " << MaxPotential << std::endl;
+  if(MaxPotential > Threshold){
+    return false;
+  }else{
+    return true;
+  }
 }
 
-bool MotionPlan::equal(double x, double y){
-  return (fabs(x-y) < EPSILON);
+
+
+// f(x,y)
+double MotionPlan::f_xy(double x,double y, std::vector<POINT> &vobstacle)
+{
+  double sum = 0.0;
+
+  for (size_t i = 0, size = vobstacle.size(); i < size; ++i){
+    sum += K*exp(-r_1*pow(x-vobstacle[i].x, 2) - r_2*pow(y-vobstacle[i].y, 2));
+  }
+  return sum;
 }
+
 
 
 // childrenのsubtreesの中で(xSample, ySample, zSample)に一番近いノードを探す(再帰的に)
@@ -217,11 +148,28 @@ MotionPlan::RRT::RRT(std::string fileName):
                      yMin(NULL), yMax(NULL)
 {
   initFromFile(fileName);
+  CreatePotentialField();
   std::ofstream file("./plot_data/testcase1_obstacle.dat");
   CreateCube(file);
   srand((unsigned int)time(NULL));
 }
 
+
+
+void MotionPlan::RRT::CreatePotentialField()
+{
+  POINT tmp;
+
+  std::cout << "ポテンシャル場の作成" << std::endl;
+  for (int i = 0; i < numObstacles; ++i) {
+    for (double x = xMin[i]; x <= xMax[i]; ++x) {
+      for(double y = yMin[i]; y <= yMax[i]; ++y){
+        tmp.x = x; tmp.y = y;
+        vobstacle.push_back(tmp);
+      }
+    }
+  }
+}
 
 
 // Reads initialization info for this RRT from a file with the
@@ -324,7 +272,7 @@ void MotionPlan::RRT::randFreeSample(double* x, double* y)
     do{
       (*x) = (((double)rand())/RAND_MAX)*(xRight - xLeft) + xLeft;
       (*y) = (((double)rand())/RAND_MAX)*(yTop - yBottom) + yBottom;
-    } while(!clear(xMin, xMax, yMin, yMax, numObstacles, *x, *y));
+    } while(!clear(*x, *y, vobstacle));
   }
 }
 
@@ -356,9 +304,7 @@ MotionPlan::RRT::TreeNode* MotionPlan::RRT::genNewNode(const TreeNode* nearest, 
   double newX = nearest->x + stepSize * (dx / dist);
   double newY = nearest->y + stepSize * (dy / dist);
 
-  if (link(xMin, xMax, yMin, yMax,
-           numObstacles,
-           nearest->x, nearest->y, newX, newY)){
+  if (link(nearest->x, nearest->y, newX, newY, vobstacle)){
 
     TreeNode* newNode = new TreeNode;
     newNode->x = newX;
@@ -382,7 +328,7 @@ bool MotionPlan::RRT::checkGoal(const TreeNode* checkNode)
   double dy = yGoal - checkNode->y;
 
   if ((dx*dx + dy*dy) <= stepSize*stepSize){
-    return link(xMin, xMax, yMin, yMax, numObstacles, checkNode->x, checkNode->y, xGoal, yGoal);
+    return link(checkNode->x, checkNode->y, xGoal, yGoal, vobstacle);
   } else{
     return false;
   }
@@ -518,7 +464,11 @@ void MotionPlan::RRT::RRTloop(int* iterations, int* nodePath, int* pathLength, s
 
       std::ofstream pathData("./plot_data/path_data.dat", std::ios_base::trunc);
       for(unsigned int addpath = 0; addpath < paths.size(); addpath++ ){
+        #ifdef APF
+        pathData << paths[addpath].x << "\t" << paths[addpath].y << "\t" << MotionPlan::f_xy(paths[addpath].x, paths[addpath].y, vobstacle) << std::endl;
+        #else
         pathData << paths[addpath].x << "\t" << paths[addpath].y << std::endl;
+        #endif
       }
       break;
 
@@ -596,9 +546,9 @@ void MotionPlan::RRT::smoothing(int loop)
     }
 
     // 2点を結んだ直線の干渉チェック
-    if (link(xMin, xMax, yMin, yMax, numObstacles,
-             paths[SamplePoint[0]].x, paths[SamplePoint[0]].y,
-             paths[SamplePoint[1]].x, paths[SamplePoint[1]].y)){
+    if (link(paths[SamplePoint[0]].x, paths[SamplePoint[0]].y,
+             paths[SamplePoint[1]].x, paths[SamplePoint[1]].y,
+             vobstacle)){
       //std::cout << SamplePoint[0] << "と" << SamplePoint[1] << "の間の点はグッバイ！" << std::endl;
       //std::cout << i+1 << "ループ目、グッバイしたあとのpathの長さは" << paths.size() << "です。" << std::endl;
       paths.erase(paths.begin()+SamplePoint[0]+1, paths.begin()+SamplePoint[1]);
@@ -629,7 +579,7 @@ void MotionPlan::RRT::smoothing(int loop)
     }
 
     old = current;
-    if(count >= 10){
+    if(count >= 20){
       //std::cout << "我慢ならん！ブレイクだ！！" << std::endl;
       break;
     }
@@ -647,13 +597,20 @@ void MotionPlan::RRT::smoothing(int loop)
 
 void MotionPlan::RRT::CreateCube(std::ostream &cube)
 {
+  #ifndef APF
   RANGE obstacle;
+  #endif
   // std::ofstream cube("./plot_data/testcase1_obstacle.dat");
   std::ofstream plot("./plot_data/start_goal.dat");
   std::ofstream pathinit("./plot_data/path_data.dat", std::ios_base::trunc);
   std::ofstream smoothData("./plot_data/path_data_mod.dat", std::ios_base::trunc);
   std::ofstream splineData("./plot_data/Bspline.dat", std::ios_base::trunc);
 
+  #ifdef APF
+  plot << xStart << "\t" << yStart << MotionPlan::f_xy(xStart, yStart, vobstacle) << std::endl;
+  plot << xGoal << "\t" << yGoal << MotionPlan::f_xy(xGoal, yGoal, vobstacle) << std::endl;
+  output_plt("./plot_data/APFplot.plt");
+  #else
   plot << xStart << "\t" << yStart << std::endl;
   plot << xGoal << "\t" << yGoal << std::endl;
 
@@ -669,6 +626,7 @@ void MotionPlan::RRT::CreateCube(std::ostream &cube)
       cube << "\n\n";
     }
   }
+  #endif
 
   #ifdef PlotAnimation
   pathinit << xStart << "\t" << yStart << std::endl;
@@ -687,10 +645,24 @@ void MotionPlan::RRT::CreateCube(std::ostream &cube)
 
 void MotionPlan::RRT::outputTree(std::ostream &outStream)
 {
+  #ifdef APF
+  POINT tmp[2];
+  #endif
+
   //ノードの座標を2点ずつのブロックでファイルに書き込み
   for (unsigned int i = 0; i < edges.size(); ++i){
+    #ifdef APF
+    tmp[0].x = (nodes[edges[i].node1])->x;
+    tmp[0].y = (nodes[edges[i].node1])->y;
+    tmp[1].x = (nodes[edges[i].node2])->x;
+    tmp[1].y = (nodes[edges[i].node2])->y;
+    outStream << tmp[0].x << "\t" << tmp[0].y << "\t" << MotionPlan::f_xy(tmp[0].x, tmp[0].y, vobstacle) << std::endl;
+    outStream << tmp[1].x << "\t" << tmp[1].y << "\t" << MotionPlan::f_xy(tmp[1].x, tmp[1].y, vobstacle) << std::endl;
+    #else
     outStream << (nodes[edges[i].node1])->x << "\t" << (nodes[edges[i].node1])->y << std::endl;
     outStream << (nodes[edges[i].node2])->x << "\t" << (nodes[edges[i].node2])->y << std::endl;
+    #endif
+
     outStream << "\n" << std::endl;
 
     #ifdef PlotAnimation
@@ -703,25 +675,27 @@ void MotionPlan::RRT::outputTree(std::ostream &outStream)
 }
 
 
+void MotionPlan::RRT::output_plt(string plt_output){
+  std::ofstream plt(plt_output);
 
-void MotionPlan::RRT::outputTree(FILE *outStream)
-{
-  for (unsigned int i = 0; i < edges.size(); ++i){
-    std::cout << i << "番目のループだよ" << std::endl;
-    //fprintf(outStream, "plot '-' using 1:2 with lines");
+  plt << "set xlabel \"x\""<< endl;
+  plt << "set ylabel \"y\"" << endl;
+  plt << "set zlabel \"z\"" << endl;
+  plt << "set xrange [" << xLeft << ":" << xRight << "]" << endl;
+  plt << "set yrange [" << yBottom << ":" << yTop << "]" << endl;
+  //plt << "set zrange [" << 0 << ":" << MAX_FIELD+1 << "]" << endl;
+  plt << "set ticslevel 0\n" << endl;
 
-    fprintf(outStream,"%lf %lf\n", ((nodes[edges[i].node1])->x), ((nodes[edges[i].node1])->y));
-    fprintf(outStream,"%lf %lf\n\n", ((nodes[edges[i].node2])->x), ((nodes[edges[i].node2])->y));
-    fprintf(outStream,"e\n"); //データ書き込み終了を知らせる．
-    //}
-    fflush(outStream);
-
-
-    // for(int k=0; k<50; ++k){
-    //   usleep(10000);
-    // }
-
+  plt << "splot ";
+  for (size_t i = 0, size = vobstacle.size(); i < size; ++i){
+    plt << " + " << K << " * exp(-" << r_1 << " * (x-" << vobstacle[i].x << ")**2 - " << r_2 << " * (y-" << vobstacle[i].y << ")**2)";
   }
+
+  plt << " title \"Potential Field\" with pm3d,\\" << endl;
+
+  plt << "\"start_goal.dat\" using 1:2:3 with points pt 7 ps 2 lt rgb \"#ff9900\" title \"Start & Goal\",\\" << endl;
+  plt << "\"data.dat\" using 1:2:3 with lines lt rgb \"#696969\" lw 1 title \"node\",\\" << endl;
+  plt << "\"path_data.dat\" using 1:2:3 with lines lt rgb \"#ff4500\" lw 2 title \"Before\"" << endl;
 }
 
 

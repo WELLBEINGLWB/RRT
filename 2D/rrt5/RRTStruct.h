@@ -18,6 +18,11 @@
 #include <unistd.h>
 
 // #define PlotAnimation
+#define APF
+
+#define K 60      // 障害物のポテンシャルの高さ
+#define r_1 2     // ポテンシャルのx軸方向の大きさ
+#define r_2 2     // ポテンシャルのy軸方向の大きさ
 
 using namespace std;
 

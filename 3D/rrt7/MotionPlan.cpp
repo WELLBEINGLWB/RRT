@@ -296,7 +296,6 @@ void MotionPlan::RRT::initFromFile(std::string fileName)
 }
 
 
-
 MotionPlan::RRT::~RRT()
 {
   if (root != NULL){

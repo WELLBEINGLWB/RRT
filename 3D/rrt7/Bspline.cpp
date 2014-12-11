@@ -71,9 +71,9 @@ void Draw::CreatePotentialField(MotionPlan::RRT &rrt)
 
   cout << "ポテンシャル場の作成" << endl;
   for (int i = 0; i < rrt.numObstacles; ++i){
-    for(double x = rrt.xMin[i]; x < rrt.xMax[i]; ++x) {
-      for(double y = rrt.yMin[i]; y < rrt.yMax[i]; ++y){
-        for(double z = rrt.zMin[i]; z < rrt.zMax[i];  ++z){
+    for(double x = rrt.xMin[i]; x <= rrt.xMax[i]; ++x) {
+      for(double y = rrt.yMin[i]; y <= rrt.yMax[i]; ++y){
+        for(double z = rrt.zMin[i]; z <= rrt.zMax[i];  ++z){
           tmp.x = x; tmp.y = y; tmp.z = z;
           vobstacle.push_back(tmp);
         }
@@ -100,9 +100,12 @@ double Draw::f_xyz(double x,double y, double z)
 // x[num], y[num], z[num] は座標の配列
 void Draw::drowSpline(std::vector<POINT> &finalpath)
 {
+  double Potential = 0.0;
   double PotentialSum = 0.0;
+  double MaxPotential = 0.0;
   double t, m;
   POINT tmp;
+  POINT MaxPoint;
   Spline xs, ys, zs;
 
   num = finalpath.size();
@@ -110,7 +113,7 @@ void Draw::drowSpline(std::vector<POINT> &finalpath)
   y = new double[num];
   z = new double[num];
 
-  for (int i = 0; i < num; ++i){
+  for (int i = 0; i < num; ++i) {
     x[i] = finalpath[i].x;
     y[i] = finalpath[i].y;
     z[i] = finalpath[i].z;
@@ -122,14 +125,21 @@ void Draw::drowSpline(std::vector<POINT> &finalpath)
 
   m = (double)(num - 1);
   std::ofstream outStream("./plot_data/Bspline.dat");
-  std::ofstream outdata("./plot_data/Potential.dat");
+  // std::ofstream outdata("./plot_data/Potential.dat");
 
-  for (t = 0; t <= m; t += 0.01){
+  for (t = 0; t <= m; t += 0.01) {
     tmp.x = xs.calc(t); tmp.y = ys.calc(t); tmp.z = zs.calc(t);
-    PotentialSum += f_xyz(tmp.x, tmp.y, tmp.z);
+    Potential = f_xyz(tmp.x, tmp.y, tmp.z);  // その座標のポテンシャル計算
+    PotentialSum += Potential;               // ポテンシャルの合計を計算
+
+    if (Potential > MaxPotential) {  // 経路中でもっとも高いポテンシャルを計算（最大値計算）
+      MaxPotential = Potential;
+      MaxPoint.x = tmp.x; MaxPoint.y = tmp.y; MaxPoint.z = tmp.z;
+    }
+
     SplinePoint.push_back(tmp);
     outStream << tmp.x << "\t" << tmp.y << "\t" << tmp.z << std::endl;
-    outdata << tmp.x << "\t" << tmp.y << "\t" << tmp.z << "\t" << f_xyz(tmp.x, tmp.y, tmp.z) << std::endl;
+    // outdata << tmp.x << "\t" << tmp.y << "\t" << tmp.z << "\t" << f_xyz(tmp.x, tmp.y, tmp.z) << std::endl;
 
     #ifdef PlotAnimation
     for (int k = 0; k < 100; ++k){
@@ -137,6 +147,8 @@ void Draw::drowSpline(std::vector<POINT> &finalpath)
     }
     #endif
   }
+  cout << "経路中の最も高いポテンシャル = " << MaxPotential << endl;
+  cout << "そのときの座標は = (" << MaxPoint.x << ", " << MaxPoint.y << ", " << MaxPoint.z << ")" << endl;
   cout << "平滑化後の経路のポテンシャルの合計 = " << PotentialSum << endl;
 
 }

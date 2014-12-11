@@ -5,7 +5,7 @@
 namespace MotionPlan
 {
   /// Checks whether a point (xTest,yTest) is in collision
-  /// with any of the obstacles defined by their min/max coordinates.
+  /// with any of the obstacles defined by their min/max coordinates.aaaa
   bool clear(const double* xMin, const double* xMax,
              const double* yMin, const double* yMax,
              int numObstacles,

@@ -35,7 +35,7 @@ bool MotionPlan::link(double xStart, double yStart,
     return false;
   }
 
-  for(double length = 0.0; length < dist; length += 0.2*stepSize){
+  for(double length = 0.0; length < dist; length += 0.5*stepSize){
     CheckX = xStart + length * (dx / dist);
     CheckY = yStart + length * (dy / dist);
     Potential = f_xy(CheckX, CheckY, vobstacle);

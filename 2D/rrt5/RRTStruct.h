@@ -19,6 +19,7 @@
 
 // #define PlotAnimation
 #define APF
+// #define Bspline
 
 // #define K 60      // 障害物のポテンシャルの高さ
 // #define r_1 2     // ポテンシャルのx軸方向の大きさ

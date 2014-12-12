@@ -554,7 +554,11 @@ void MotionPlan::RRT::smoothing(int loop)
 
       std::ofstream outStream("./plot_data/path_data_mod.dat", std::ios_base::trunc);
       for (unsigned int k = 0; k < paths.size(); k++) {
+        #ifdef APF
+        outStream << paths[k].x << "\t" << paths[k].y << "\t" << MotionPlan::f_xy(paths[k].x, paths[k].y, vobstacle) << std::endl;
+        #else
         outStream << paths[k].x << "\t" << paths[k].y << std::endl;
+        #endif
       }
 
       #ifdef PlotAnimation
@@ -695,7 +699,8 @@ void MotionPlan::RRT::output_plt(string plt_output){
 
   plt << "\"start_goal.dat\" using 1:2:3 with points pt 7 ps 2 lt rgb \"#ff9900\" title \"Start & Goal\",\\" << endl;
   plt << "\"data.dat\" using 1:2:3 with lines lt rgb \"#696969\" lw 1 title \"node\",\\" << endl;
-  plt << "\"path_data.dat\" using 1:2:3 with lines lt rgb \"#ff4500\" lw 2 title \"Before\"" << endl;
+  plt << "\"path_data.dat\" using 1:2:3 with lines lt rgb \"#ff4500\" lw 3 title \"Before\",\\" << endl;
+  plt << "\"path_data_mod.dat\" using 1:2:3 with lines lt rgb \"#66cdaa\" lw 3 title \"After\"" << endl;
 }
 
 

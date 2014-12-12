@@ -14,12 +14,11 @@ bool MotionPlan::clear(double xTest, double yTest, std::vector<POINT> &vobstacle
 
 bool MotionPlan::link(double xStart, double yStart,
                       double xDest, double yDest,
-                      std::vector<POINT> &vobstacle)
+                      std::vector<POINT> &vobstacle, double stepSize)
 {
   double dx = xDest - xStart;
   double dy = yDest - yStart;
   double dist = sqrt(dx * dx + dy * dy);
-  double stepSize = 0.1;
 
   double CheckX;
   double CheckY;
@@ -36,7 +35,7 @@ bool MotionPlan::link(double xStart, double yStart,
     return false;
   }
 
-  for(double length = 0.0; length < dist; length += 0.1*stepSize){
+  for(double length = 0.0; length < dist; length += 0.2*stepSize){
     CheckX = xStart + length * (dx / dist);
     CheckY = yStart + length * (dy / dist);
     Potential = f_xy(CheckX, CheckY, vobstacle);
@@ -304,7 +303,7 @@ MotionPlan::RRT::TreeNode* MotionPlan::RRT::genNewNode(const TreeNode* nearest, 
   double newX = nearest->x + stepSize * (dx / dist);
   double newY = nearest->y + stepSize * (dy / dist);
 
-  if (link(nearest->x, nearest->y, newX, newY, vobstacle)){
+  if (link(nearest->x, nearest->y, newX, newY, vobstacle, stepSize)){
 
     TreeNode* newNode = new TreeNode;
     newNode->x = newX;
@@ -328,7 +327,7 @@ bool MotionPlan::RRT::checkGoal(const TreeNode* checkNode)
   double dy = yGoal - checkNode->y;
 
   if ((dx*dx + dy*dy) <= stepSize*stepSize){
-    return link(checkNode->x, checkNode->y, xGoal, yGoal, vobstacle);
+    return link(checkNode->x, checkNode->y, xGoal, yGoal, vobstacle, stepSize);
   } else{
     return false;
   }
@@ -476,7 +475,7 @@ void MotionPlan::RRT::RRTloop(int* iterations, int* nodePath, int* pathLength, s
       std::cout << "Path not found." << std::endl;
     }
   }
-  smoothing(10000);
+  smoothing(50000);
 
 }
 
@@ -548,7 +547,7 @@ void MotionPlan::RRT::smoothing(int loop)
     // 2点を結んだ直線の干渉チェック
     if (link(paths[SamplePoint[0]].x, paths[SamplePoint[0]].y,
              paths[SamplePoint[1]].x, paths[SamplePoint[1]].y,
-             vobstacle)){
+             vobstacle, stepSize)){
       //std::cout << SamplePoint[0] << "と" << SamplePoint[1] << "の間の点はグッバイ！" << std::endl;
       //std::cout << i+1 << "ループ目、グッバイしたあとのpathの長さは" << paths.size() << "です。" << std::endl;
       paths.erase(paths.begin()+SamplePoint[0]+1, paths.begin()+SamplePoint[1]);

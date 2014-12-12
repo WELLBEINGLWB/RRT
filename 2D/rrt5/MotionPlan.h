@@ -2,7 +2,7 @@
 #define _MOTION_PLAN_H_
 #include "RRTStruct.h"
 
-#define Threshold 30
+#define Threshold 0.5
 
 namespace MotionPlan
 {
@@ -15,7 +15,7 @@ namespace MotionPlan
   /// of the obstacles defined by their mein/max coordinates
   bool link(double xStart, double yStart,
             double xDest, double yDest,
-            std::vector<POINT> &vobstacle);
+            std::vector<POINT> &vobstacle, double stepSize);
 
   double f_xy(double x,double y, std::vector<POINT> &vobstacle);
 

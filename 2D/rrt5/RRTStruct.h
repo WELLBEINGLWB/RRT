@@ -17,7 +17,9 @@
 #include <sys/time.h>
 #include <unistd.h>
 
-// #define PlotAnimation
+#define Bspline
+//#define PlotAnimation
+
 
 using namespace std;
 
@@ -30,5 +32,7 @@ typedef struct {
   double xrange[2];
   double yrange[2];
 } RANGE;
+
+string input_arg(int argc, char* argv[]);
 
 #endif

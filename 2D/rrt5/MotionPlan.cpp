@@ -606,8 +606,8 @@ void MotionPlan::RRT::CreateCube(std::ostream &cube)
   std::ofstream splineData("./plot_data/Bspline.dat", std::ios_base::trunc);
 
   #ifdef APF
-  plot << xStart << "\t" << yStart << MotionPlan::f_xy(xStart, yStart, vobstacle) << std::endl;
-  plot << xGoal << "\t" << yGoal << MotionPlan::f_xy(xGoal, yGoal, vobstacle) << std::endl;
+  plot << xStart << "\t" << yStart << "\t" << MotionPlan::f_xy(xStart, yStart, vobstacle) << std::endl;
+  plot << xGoal << "\t" << yGoal << "\t" << MotionPlan::f_xy(xGoal, yGoal, vobstacle) << std::endl;
   output_plt("./plot_data/APFplot.plt");
   #else
   plot << xStart << "\t" << yStart << std::endl;
@@ -682,6 +682,7 @@ void MotionPlan::RRT::output_plt(string plt_output){
   plt << "set zlabel \"z\"" << endl;
   plt << "set xrange [" << xLeft << ":" << xRight << "]" << endl;
   plt << "set yrange [" << yBottom << ":" << yTop << "]" << endl;
+  plt << "set zrange [" << 0 << ":" << 2.5*K << "]" << endl;
   //plt << "set zrange [" << 0 << ":" << MAX_FIELD+1 << "]" << endl;
   plt << "set ticslevel 0\n" << endl;
 

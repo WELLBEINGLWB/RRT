@@ -18,7 +18,7 @@
 #include <unistd.h>
 
 // #define PlotAnimation
-// #define APF
+#define APF
 
 // #define K 60      // 障害物のポテンシャルの高さ
 // #define r_1 2     // ポテンシャルのx軸方向の大きさ
@@ -38,5 +38,7 @@ typedef struct {
   double xrange[2];
   double yrange[2];
 } RANGE;
+
+string input_arg(int argc, char* argv[]);
 
 #endif

@@ -30,8 +30,6 @@ typedef struct {
 
 namespace MotionPlan
 {
-  /// Checks whether a point (xTest,yTest) is in collision
-  /// with any of the obstacles defined by their min/max coordinates.
   bool clear(const double* xMin, const double* xMax,
              const double* yMin, const double* yMax,
              const double* zMin, const double* zMax,
@@ -47,9 +45,6 @@ namespace MotionPlan
   void Pcompare(POINT A, POINT B, POINT *compare);
 
 
-  /// A geometrically exact query for whether the line between
-  /// points (xStart,yStart) and (xDest,yDest) collides with any
-  /// of the obstacles defined by their mein/max coordinates
   bool link(const double* xMin, const double* xMax,
             const double* yMin, const double* yMax,
             const double* zMin, const double* zMax,

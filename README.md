@@ -61,7 +61,7 @@ void MotionPlan::RRT::randFreeSample(double* x, double* y)
 * 障害物が動いても対応できるようなものも多少作っている。ロボットアームがどこまで動いているかっていうのが全く定義しきれていないから、実際には使えない。
 
 ### rrt5
-* branch、「APF_Collision_Check」にて衝突判定において人工ポテンシャル法を使っている。
+* branch、「[APF_Collision_Check](https://github.com/Ry0/RRT/tree/APF_Collision_Check/2D/rrt5)」にて衝突判定において人工ポテンシャル法を使っている。
 * ただし現段階(2014.12.15)では実行速度が幾何学的に衝突判定を行っている従来の方法と比べてかなり遅いのでそこが問題
 
 ```cpp
@@ -169,7 +169,9 @@ void MotionPlan::RRT::randFreeSample(double* x, double* y)
 * `class Draw{ }`クラスの改善
 * `#define PlotAnimation`による切り替え
 
-
+## [3. initial](https://github.com/Ry0/RRT/tree/APF_Collision_Check/initial)
+実際に適応するまえのテスト段階のソースコードたち  
+3次元の衝突判定だったり、経路の洗練の部分だったり、スプライン処理だったり、APFの衝突判定だったり...
 
 
 

@@ -3,7 +3,7 @@
 * RRT(Rapidly exploring Random Tree)のコード
 * 2次元版と3次元版がある
 * 最近では人工ポテンシャル場と組み合わせたやつもある
-* branchは「APF_Collision_Check」
+* branchは「master」
 
 ## [1. 2D](https://github.com/Ry0/RRT/tree/master/2D)
 RRTの2Dバージョン  

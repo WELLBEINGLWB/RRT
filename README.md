@@ -92,7 +92,7 @@ void MotionPlan::RRT::randFreeSample(double* x, double* y)
 * 2Dでやってきたノウハウを活かしたものが多い
 * 3次元での衝突判定は2次元のときと都合が違ってくるので、そこは大きく変更している
 * 3次元でもAPFを組み込んでみる予定
-* 2014.12.15 時点でrrt7が一番新しいやつ
+* 2014.12.15 時点でrrt7が一番新しいやつ  
 ![rrt3d](https://dl.dropboxusercontent.com/u/23873125/Markdown/rrt3d_mod.jpg)
 
 ### rrt4
@@ -172,19 +172,3 @@ void MotionPlan::RRT::randFreeSample(double* x, double* y)
 ## [3. initial](https://github.com/Ry0/RRT/tree/master/initial)
 実際に適応するまえのテスト段階のソースコードたち  
 3次元の衝突判定だったり、経路の洗練の部分だったり、スプライン処理だったり、APFの衝突判定だったり...
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

@@ -27,7 +27,8 @@ bool MotionPlan::link(double xStart, double yStart,
   double MaxPotential = 0.0;
   // POINT MaxPoint;
   // bool flag = true;
-  std::ofstream outStream("./plot_data/PotentialData.dat");
+
+  // std::ofstream outStream("./plot_data/PotentialData.dat");
 
   if (!clear(xStart, yStart, vobstacle) ||
       !clear(xDest, yDest, vobstacle)) {
@@ -39,7 +40,7 @@ bool MotionPlan::link(double xStart, double yStart,
     CheckX = xStart + length * (dx / dist);
     CheckY = yStart + length * (dy / dist);
     Potential = f_xy(CheckX, CheckY, vobstacle);
-    outStream << CheckX << "\t" << CheckY << "\t" << Potential << std::endl;
+    // outStream << CheckX << "\t" << CheckY << "\t" << Potential << std::endl;
 
     if (Potential > MaxPotential) {  // 経路中でもっとも高いポテンシャルを計算（最大値計算）
       MaxPotential = Potential;

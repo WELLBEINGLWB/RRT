@@ -2,49 +2,22 @@
 #define _MOTION_PLAN_H_
 #include "RRTStruct.h"
 
+#define Threshold 0.5
+
 namespace MotionPlan
 {
   /// Checks whether a point (xTest,yTest) is in collision
   /// with any of the obstacles defined by their min/max coordinates.
-  bool clear(const double* xMin, const double* xMax,
-             const double* yMin, const double* yMax,
-             const double* zMin, const double* zMax,
-             int numObstacles,
-             double xTest, double yTest, double zTest);
-
-  void CreateGridPoint(const double* xMin, const double* xMax,
-                       const double* yMin, const double* yMax,
-                       const double* zMin, const double* zMax, POINT *P, int i);
-
-  void PlaneEquation(POINT p[], int i0[], int i1[], int i2[], int i, double a[]);
-
-  void Pcompare(POINT A, POINT B, POINT *compare);
-
+  bool clear(double xTest, double yTest, std::vector<POINT> &vobstacle);
 
   /// A geometrically exact query for whether the line between
   /// points (xStart,yStart) and (xDest,yDest) collides with any
   /// of the obstacles defined by their mein/max coordinates
-  bool link(const double* xMin, const double* xMax,
-            const double* yMin, const double* yMax,
-            const double* zMin, const double* zMax,
-            int numObstacles,
-            double xStart, double yStart, double zStart,
-            double xDest, double yDest, double zDest);
+  bool link(double xStart, double yStart,
+            double xDest, double yDest,
+            std::vector<POINT> &vobstacle, double stepSize);
 
-  void CreateGrid(const double xMin, const double xMax,
-                  const double yMin, const double yMax,
-                  const double zMin, const double zMax, POINT *P);
-
-  void PlaneEquation(POINT p[], int i0[], int i1[], int i2[], int i, double a[]);
-
-  void Pcompare(double xStart, double yStart, double zStart,
-                double xDest, double yDest, double zDest, POINT *compare);
-
-  bool Intersection(const double xMin, const double xMax,
-                    const double yMin, const double yMax,
-                    const double zMin, const double zMax,
-                    double xStart, double yStart, double zStart,
-                    double xDest, double yDest, double zDest);
+  double f_xy(double x,double y, std::vector<POINT> &vobstacle);
 
 
   class RRT

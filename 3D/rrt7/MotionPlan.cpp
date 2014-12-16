@@ -1,153 +1,73 @@
 #include "MotionPlan.h"
 
-// (xTest, yTest)が障害物の中にあるかどうかの判定
-bool MotionPlan::clear(const double* xMin, const double* xMax,
-                       const double* yMin, const double* yMax,
-                       const double* zMin, const double* zMax,
-                       int numObstacles,
-                       double xTest, double yTest, double zTest)
-{
-  for (int i = 0; i < numObstacles; ++i) { // 障害物の範囲内ならreturn false
-    if (xMin[i] <= xTest && xTest <= xMax[i] &&
-        yMin[i] <= yTest && yTest <= yMax[i] &&
-        zMin[i] <= zTest && zTest <= zMax[i]) {
-      return false;
-    }
-  }
 
-  return true; // すべての障害物の中に入ってなかったらreturn true
-}
-
-
-
-void MotionPlan::CreateGridPoint(const double* xMin, const double* xMax,
-                                 const double* yMin, const double* yMax,
-                                 const double* zMin, const double* zMax, POINT *P, int i)
-{
-  P[0].x = xMin[i]; P[0].y = yMin[i]; P[0].z = zMin[i]; // x,y,zの最小値、最大値からそれぞれの座標を割り出し、Pに代入。
-  P[1].x = xMax[i]; P[1].y = yMin[i]; P[1].z = zMin[i];
-  P[2].x = xMax[i]; P[2].y = yMax[i]; P[2].z = zMin[i];
-  P[3].x = xMin[i]; P[3].y = yMax[i]; P[3].z = zMin[i];
-  P[4].x = xMin[i]; P[4].y = yMin[i]; P[4].z = zMax[i];
-  P[5].x = xMax[i]; P[5].y = yMin[i]; P[5].z = zMax[i];
-  P[6].x = xMax[i]; P[6].y = yMax[i]; P[6].z = zMax[i];
-  P[7].x = xMin[i]; P[7].y = yMax[i]; P[7].z = zMax[i];
-}
-
-
-
-void MotionPlan::PlaneEquation(POINT p[], int i0[], int i1[], int i2[], int i, double a[])
-{
-  // 平面の方程式の係数を導出 (ax+by+cz=d)
-  // http://keisan.casio.jp/has10/SpecExec.cgi
-  a[0] = (p[i1[i]].y-p[i0[i]].y)*(p[i2[i]].z-p[i0[i]].z)-(p[i2[i]].y-p[i0[i]].y)*(p[i1[i]].z-p[i0[i]].z);
-  a[1] = (p[i1[i]].z-p[i0[i]].z)*(p[i2[i]].x-p[i0[i]].x)-(p[i2[i]].z-p[i0[i]].z)*(p[i1[i]].x-p[i0[i]].x);
-  a[2] = (p[i1[i]].x-p[i0[i]].x)*(p[i2[i]].y-p[i0[i]].y)-(p[i2[i]].x-p[i0[i]].x)*(p[i1[i]].y-p[i0[i]].y);
-  a[3] = a[0]*p[i0[i]].x + a[1]*p[i0[i]].y + a[2]*p[i0[i]].z;
-
-  //cout << a[0] << " x + " << a[1] << " y + " << a[2] <<  " z + " << a[3] << " = 0" << endl;
-}
-
-
-
-void MotionPlan::Pcompare(POINT A, POINT B, POINT *compare)
-{
-  // 与えられた2点のどちらが小さいか、配列compareに小さい順に格納
-  if ((A.x - B.x) > 0) {
-    compare[0].x = B.x;
-    compare[1].x = A.x;
+/// Simple iterates over each object in the space
+/// and checks whether the test point lies inside the obstacle.
+bool MotionPlan::clear(double xTest, double yTest, std::vector<POINT> &vobstacle){
+  if(f_xy(xTest, yTest, vobstacle) > Threshold){
+    return false;
   }else{
-    compare[0].x = A.x;
-    compare[1].x = B.x;
-  }
-
-  if((A.y - B.y) > 0) {
-    compare[0].y = B.y;
-    compare[1].y = A.y;
-  }else{
-    compare[0].y = A.y;
-    compare[1].y = B.y;
-  }
-
-  if((A.z - B.z) > 0) {
-    compare[0].z = B.z;
-    compare[1].z = A.z;
-  }else{
-    compare[0].z = A.z;
-    compare[1].z = B.z;
+    return true;
   }
 }
 
 
 
-bool MotionPlan::link(const double* xMin, const double* xMax,
-                      const double* yMin, const double* yMax,
-                      const double* zMin, const double* zMax,
-                      int numObstacles,
-                      double xStart, double yStart, double zStart,
-                      double xDest, double yDest, double zDest)
+bool MotionPlan::link(double xStart, double yStart,
+                      double xDest, double yDest,
+                      std::vector<POINT> &vobstacle, double stepSize)
 {
-  int i = 0;
-  bool flag = true;
-  POINT A, B, P, p[8], E, compare[2];
-  double a[4];
-  double t, DE;
-  int i0[6] = {0,0,1,2,3,4}; // 配列の組み合わせはノート見る。
-  int i1[6] = {1,1,2,3,4,5}; // 0から5までの6面定義、3点で考える。
-  int i2[6] = {2,4,5,6,7,6};
+  double dx = xDest - xStart;
+  double dy = yDest - yStart;
+  double dist = sqrt(dx * dx + dy * dy);
 
-  A.x = xStart; A.y = yStart; A.z = zStart;
-  B.x = xDest ; B.y = yDest ; B.z = zDest;
+  double CheckX;
+  double CheckY;
 
-  if (!clear(xMin, xMax, yMin, yMax, zMin, zMax, numObstacles, xStart, yStart, zStart) ||
-      !clear(xMin, xMax, yMin, yMax, zMin, zMax, numObstacles, xDest, yDest, zDest)) {
+  double Potential;
+  double MaxPotential = 0.0;
+  // POINT MaxPoint;
+  // bool flag = true;
+  std::ofstream outStream("./plot_data/PotentialData.dat");
+
+  if (!clear(xStart, yStart, vobstacle) ||
+      !clear(xDest, yDest, vobstacle)) {
+    //std::cout << "スタートとゴールが障害物内" << std::endl;
     return false;
   }
 
-  Pcompare(A, B, compare);
+  for(double length = 0.0; length < dist; length += 0.5*stepSize){
+    CheckX = xStart + length * (dx / dist);
+    CheckY = yStart + length * (dy / dist);
+    Potential = f_xy(CheckX, CheckY, vobstacle);
+    outStream << CheckX << "\t" << CheckY << "\t" << Potential << std::endl;
 
-  // 平面と直線の交点を導出 (参考サイト：http://www.hiramine.com/programming/graphics/3d_planesegmentintersection.html)
-  E.x = A.x - B.x;
-  E.y = A.y - B.y;
-  E.z = A.z - B.z;
+    if (Potential > MaxPotential) {  // 経路中でもっとも高いポテンシャルを計算（最大値計算）
+      MaxPotential = Potential;
+      // MaxPoint.x = CheckX;
+      // MaxPoint.y = CheckY;
+    }
 
-  for (int j = 0; j < numObstacles; ++j) {
-    CreateGridPoint(xMin, xMax, yMin, yMax, zMin, zMax, p, j);
-
-    do{
-      PlaneEquation(p, i0, i1, i2, i, a);
-
-      t = (a[3] - (a[0] * A.x + a[1] * A.y + a[2] * A.z)) / (a[0] * E.x + a[1] * E.y + a[2] * E.z);
-      DE = a[0] * E.x + a[1] * E.y + a[2] * E.z;
-
-      if(DE == 0){
-        // std::cout << j+1 << "番目の障害物: " << i << "面と直線との交点なし" << std::endl;
-      }else{
-        // std::cout << "交点あり" << endl;
-        P.x = A.x + t * E.x;
-        P.y = A.y + t * E.y;
-        P.z = A.z + t * E.z;
-        // std::cout << j+1 << "番目の障害物: " << i << "面, (" << P.x << ", " << P.y << ", " << P.z << ")" << std::endl;
-
-        if (xMin[j] <= P.x && P.x <= xMax[j] &&
-            yMin[j] <= P.y && P.y <= yMax[j] &&
-            zMin[j] <= P.z && P.z <= zMax[j] &&
-            compare[0].x <= P.x && P.x <= compare[1].x &&
-            compare[0].y <= P.y && P.y <= compare[1].y &&
-            compare[0].z <= P.z && P.z <= compare[1].z) {
-          // std::cout << j+1 << "番目の障害物: " << i << "面, 定義した4点内に入っている" << std::endl;
-          flag = false;
-          break;
-        }else{
-          // std::cout << j+1 << "番目の障害物: " << i << "面, 範囲外" << std::endl;
-        }
-      }
-      i++;
-    }while(i<6);
-    i = 0;
   }
+  // std::cout << "MaxPotential = " << MaxPotential << std::endl;
+  if(MaxPotential > Threshold){
+    return false;
+  }else{
+    return true;
+  }
+}
 
-  return flag;
+
+
+// f(x,y)
+double MotionPlan::f_xy(double x,double y, std::vector<POINT> &vobstacle)
+{
+  double sum = 0.0;
+
+  for (size_t i = 0, size = vobstacle.size(); i < size; ++i){
+    sum += K*exp(-r_1*pow(x-vobstacle[i].x, 2) - r_2*pow(y-vobstacle[i].y, 2));
+  }
+  return sum;
 }
 
 

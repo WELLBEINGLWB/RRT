@@ -168,6 +168,8 @@ void MotionPlan::RRT::randFreeSample(double* x, double* y)
 * rrt6で実装した平滑化処理のあと一応ポテンシャル法によってスプライン曲線が障害物とぶつかっていないかどうかを見るようにした
 * `class Draw{ }`クラスの改善
 * `#define PlotAnimation`による切り替え
+* 2014.12.16 APFによる衝突判定をささっと導入した
+* 簡単な障害物に関しては簡単に成功している（割と速い）
 
 ## [3. initial](https://github.com/Ry0/RRT/tree/APF_Collision_Check/initial)
 実際に適応するまえのテスト段階のソースコードたち  

@@ -33,4 +33,6 @@ typedef struct {
   double zrange[2];
 } RANGE;
 
+string input_arg(int argc, char* argv[]);
+
 #endif

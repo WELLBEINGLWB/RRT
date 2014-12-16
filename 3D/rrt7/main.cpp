@@ -8,23 +8,14 @@ int main(int argc, char* argv[])
   int path[4096];
   int pathLength;
   vector<POINT> finalpath;
+  string inputfilename;
 
-  string PlotDataPass = "./plot_data/";
-  string filename;
-
-  if (argc <= 1) {
-    cout << "障害物のデータを指定して実行してください。(例: ./rrt ほにゃほにゃ.dat)" << endl;
-    return -1;
-  } else if (argc == 2) {
-    string ObstacleFile = string(argv[1]);
-    filename = PlotDataPass + ObstacleFile;
-    cout << "ファイルパスは \"" << filename << "\" でし。" << endl;
-  } else {
-    cout << "引数は1つだけにしてくださいな。" << endl;
+  inputfilename = input_arg(argc, argv);
+  if(inputfilename == "ERROR"){
     return -1;
   }
 
-  MotionPlan::RRT rrt(filename); // RRTの計算クラス
+  MotionPlan::RRT rrt(inputfilename); // RRTの計算クラス
   Draw Sp(rrt); // B-splineの計算、APFチェックのクラス
   std::ofstream file("./plot_data/data.dat");
 

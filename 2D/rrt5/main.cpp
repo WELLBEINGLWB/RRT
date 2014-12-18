@@ -2,7 +2,6 @@
 #include "MotionPlan.h"
 #include "Bspline.h"
 
-
 int main(int argc, char* argv[])
 {
   int iters;

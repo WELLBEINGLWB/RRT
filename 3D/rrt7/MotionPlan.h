@@ -2,22 +2,22 @@
 #define _MOTION_PLAN_H_
 #include "RRTStruct.h"
 
-#define Threshold 0.5
+#define Threshold 0.2
 
 namespace MotionPlan
 {
   /// Checks whether a point (xTest,yTest) is in collision
   /// with any of the obstacles defined by their min/max coordinates.
-  bool clear(double xTest, double yTest, std::vector<POINT> &vobstacle);
+  bool clear(double xTest, double yTest, double zTest, std::vector<POINT> &vobstacle);
 
   /// A geometrically exact query for whether the line between
   /// points (xStart,yStart) and (xDest,yDest) collides with any
   /// of the obstacles defined by their mein/max coordinates
-  bool link(double xStart, double yStart,
-            double xDest, double yDest,
+  bool link(double xStart, double yStart, double zStart,
+            double xDest, double yDest, double zDest,
             std::vector<POINT> &vobstacle, double stepSize);
 
-  double f_xy(double x,double y, std::vector<POINT> &vobstacle);
+  double f_xy(double x,double y, double z, std::vector<POINT> &vobstacle);
 
 
   class RRT
@@ -66,6 +66,8 @@ namespace MotionPlan
 
     /// Initializes the RRT as above, except uses data from a file to do so.
     RRT(std::string fileName);
+
+    void CreatePotentialField();
 
     /// Destructor
     ~RRT();

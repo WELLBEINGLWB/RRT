@@ -1,11 +1,6 @@
 #include "RRTStruct.h"
 #include "MotionPlan.h"
 #define MaxSplineSize 500
-#define K 60      // 障害物のポテンシャルの高さ
-#define K_1 6     // goalに導く引力ポテンシャルの高さ
-#define r_1 3     // ポテンシャルのx軸方向の大きさ
-#define r_2 3     // ポテンシャルのy軸方向の大きさ
-#define r_3 3     // ポテンシャルのz軸方向の大きさ
 
 class Draw
 {

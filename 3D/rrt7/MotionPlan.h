@@ -2,7 +2,7 @@
 #define _MOTION_PLAN_H_
 #include "RRTStruct.h"
 
-#define Threshold 0.2
+#define Threshold 50
 
 namespace MotionPlan
 {
@@ -161,6 +161,9 @@ namespace MotionPlan
 
     /// RRTの最終的な経路の座標データ
     std::vector<POINT> paths;
+
+    /// ポテンシャル場を形成するための障害物点を定義するようベクター
+    std::vector<POINT> vobstacle;
 
     /// Maximum number of iterations to run when finding a path
     /// before givin up.

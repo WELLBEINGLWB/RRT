@@ -17,10 +17,12 @@ int main(int argc, char* argv[])
   }
   /*------------------------------------------------------------*/
 
-  MotionPlan::RRT rrt(inputfilename); // RRTの計算クラス
-  // Draw Sp(rrt); // B-splineの計算、APFチェックのクラス
-  std::ofstream file("./plot_data/data.dat");
+  MotionPlan::RRT rrt(inputfilename);         // RRTの計算クラス
+  std::ofstream file("./plot_data/data.dat"); // 木の幹用ファイル作成（全部）
 
+  #ifdef Bspline               // 経路の平滑化をするかどうか
+  Draw Sp(rrt);                // B-splineの計算、APFチェックのクラス
+  #endif
 
   #ifndef PlotAnimation
   struct timeval start, end;
@@ -30,7 +32,9 @@ int main(int argc, char* argv[])
   rrt.RRTloop(&iters, path, &pathLength, file);
   rrt.OutputFinalPath(&finalpath);
 
-  // Sp.drowSpline(finalpath);
+  #ifdef Bspline
+  Sp.drowSpline(finalpath);    // 平滑化＋ポテンシャル法による経路の衝突判定β
+  #endif
 
   #ifndef PlotAnimation
   gettimeofday(&end, NULL);

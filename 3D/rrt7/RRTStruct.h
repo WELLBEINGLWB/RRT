@@ -19,15 +19,15 @@
 
 // #define PlotAnimation
 #define APF
-// #define Bspline
+#define Bspline
 
 // #define K 60      // 障害物のポテンシャルの高さ
 // #define r_1 2     // ポテンシャルのx軸方向の大きさ
 // #define r_2 2     // ポテンシャルのy軸方向の大きさ
-#define K 1      // 障害物のポテンシャルの高さ
-#define r_1 20     // ポテンシャルのx軸方向の大きさ
-#define r_2 20     // ポテンシャルのy軸方向の大きさ
-#define r_3 20     // ポテンシャルのz軸方向の大きさ
+#define K 60      // 障害物のポテンシャルの高さ
+#define r_1 3     // ポテンシャルのx軸方向の大きさ
+#define r_2 3     // ポテンシャルのy軸方向の大きさ
+#define r_3 3     // ポテンシャルのz軸方向の大きさ
 
 using namespace std;
 

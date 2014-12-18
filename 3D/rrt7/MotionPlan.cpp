@@ -167,11 +167,11 @@ void MotionPlan::RRT::CreatePotentialField()
 
   std::cout << "ポテンシャル場の作成" << std::endl;
   for (int i = 0; i < numObstacles; ++i) {
-    for (double x = xMin[i]; x <= xMax[i]; x+=0.1) {
-      for(double y = yMin[i]; y <= yMax[i]; y+=0.1){
-        for(double z = zMin[i]; z <= zMax[i]; z+=0.1){
+    for (double x = xMin[i]; x <= xMax[i]; x+=1) {
+      for(double y = yMin[i]; y <= yMax[i]; y+=1){
+        for(double z = zMin[i]; z <= zMax[i]; z+=1){
           tmp.x = x; tmp.y = y; tmp.z = z;
-          paths.push_back(tmp);
+          vobstacle.push_back(tmp);
         }
       }
     }
@@ -237,6 +237,7 @@ void MotionPlan::RRT::initFromFile(std::string fileName)
   printf("\nスタートとゴール    : Start[%5.2lf, %5.2lf, %5.2lf]\n", xStart, yStart, zStart);
   printf("                        End[%5.2lf, %5.2lf, %5.2lf]\n\n", xGoal, yGoal, zGoal);
 }
+
 
 
 MotionPlan::RRT::~RRT()
@@ -332,7 +333,7 @@ MotionPlan::RRT::TreeNode* MotionPlan::RRT::genNewNode(const TreeNode* nearest, 
   double newY = nearest->y + stepSize * (dy / dist);
   double newZ = nearest->z + stepSize * (dz / dist);
 
-  if (link(nearest->x, nearest->y, nearest->z, newX, newY, newZ, paths, stepSize)){
+  if (link(nearest->x, nearest->y, nearest->z, newX, newY, newZ, vobstacle, stepSize)){
 
     TreeNode* newNode = new TreeNode;
     newNode->x = newX;
@@ -358,7 +359,7 @@ bool MotionPlan::RRT::checkGoal(const TreeNode* checkNode)
   double dz = zGoal - checkNode->z;
 
   if ((dx*dx + dy*dy + dz*dz) <= stepSize*stepSize){
-    return link(checkNode->x, checkNode->y, checkNode->z, xGoal, yGoal, zGoal, paths, stepSize);
+    return link(checkNode->x, checkNode->y, checkNode->z, xGoal, yGoal, zGoal, vobstacle, stepSize);
   } else{
     return false;
   }
@@ -578,7 +579,7 @@ void MotionPlan::RRT::smoothing(int loop)
     // 2点を結んだ直線の干渉チェック
     if (link(paths[SamplePoint[0]].x, paths[SamplePoint[0]].y, paths[SamplePoint[0]].z,
              paths[SamplePoint[1]].x, paths[SamplePoint[1]].y, paths[SamplePoint[1]].z,
-             paths, stepSize)){
+             vobstacle, stepSize)){
       //std::cout << SamplePoint[0] << "と" << SamplePoint[1] << "の間の点はグッバイ！" << std::endl;
       //std::cout << i+1 << "ループ目、グッバイしたあとのpathの長さは" << paths.size() << "です。" << std::endl;
       paths.erase(paths.begin()+SamplePoint[0]+1, paths.begin()+SamplePoint[1]);
@@ -609,7 +610,7 @@ void MotionPlan::RRT::smoothing(int loop)
     }
 
     old = current;
-    if(count >= 10){
+    if(count >= 20){
       //std::cout << "我慢ならん！ブレイクだ！！" << std::endl;
       break;
     }

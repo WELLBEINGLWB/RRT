@@ -127,7 +127,7 @@ void Draw::drowSpline(std::vector<POINT> &finalpath)
   std::ofstream outStream("./plot_data/Bspline.dat");
   // std::ofstream outdata("./plot_data/Potential.dat");
 
-  for (t = 0; t <= m; t += 0.01) {
+  for (t = 0; t <= m; t += 0.0046) {
     tmp.x = xs.calc(t); tmp.y = ys.calc(t); tmp.z = zs.calc(t);
     Potential = f_xyz(tmp.x, tmp.y, tmp.z);  // その座標のポテンシャル計算
     PotentialSum += Potential;               // ポテンシャルの合計を計算

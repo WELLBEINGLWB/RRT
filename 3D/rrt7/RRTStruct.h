@@ -18,7 +18,7 @@
 #include <unistd.h>
 
 // #define PlotAnimation
-
+#define Bspline
 using namespace std;
 
 typedef struct{

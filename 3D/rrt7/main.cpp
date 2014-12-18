@@ -8,17 +8,21 @@ int main(int argc, char* argv[])
   int path[4096];
   int pathLength;
   vector<POINT> finalpath;
-  string inputfilename;
 
+  /*----------探索をするためのファイルをインプットする----------*/
+  string inputfilename;
   inputfilename = input_arg(argc, argv);
   if(inputfilename == "ERROR"){
     return -1;
   }
+  /*------------------------------------------------------------*/
 
   MotionPlan::RRT rrt(inputfilename); // RRTの計算クラス
-  Draw Sp(rrt); // B-splineの計算、APFチェックのクラス
   std::ofstream file("./plot_data/data.dat");
 
+  #ifdef Bspline               // 経路の平滑化をするかどうか
+  Draw Sp(rrt);                // B-splineの計算、APFチェックのクラス
+  #endif
 
   #ifndef PlotAnimation
   struct timeval start, end;
@@ -28,7 +32,9 @@ int main(int argc, char* argv[])
   rrt.RRTloop(&iters, path, &pathLength, file);
   rrt.OutputFinalPath(&finalpath);
 
-  Sp.drowSpline(finalpath);
+  #ifdef Bspline
+  Sp.drowSpline(finalpath);    // 平滑化＋ポテンシャル法による経路の衝突判定β
+  #endif
 
   #ifndef PlotAnimation
   gettimeofday(&end, NULL);

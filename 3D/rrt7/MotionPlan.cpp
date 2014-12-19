@@ -46,8 +46,6 @@ bool MotionPlan::link(double xStart, double yStart, double zStart,
 
     if (Potential > MaxPotential) {  // 経路中でもっとも高いポテンシャルを計算（最大値計算）
       MaxPotential = Potential;
-      // MaxPoint.x = CheckX;
-      // MaxPoint.y = CheckY;
     }
 
   }

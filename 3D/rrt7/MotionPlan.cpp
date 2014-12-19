@@ -42,7 +42,7 @@ bool MotionPlan::link(double xStart, double yStart, double zStart,
     CheckY = yStart + length * (dy / dist);
     CheckZ = zStart + length * (dz / dist);
     Potential = f_xy(CheckX, CheckY, CheckZ, vobstacle);
-    // outStream << CheckX << "\t" << CheckY << "\t" << Potential << std::endl;
+    //outStream << CheckX << "\t" << CheckY << "\t" << Potential << std::endl;
 
     if (Potential > MaxPotential) {  // 経路中でもっとも高いポテンシャルを計算（最大値計算）
       MaxPotential = Potential;
@@ -709,6 +709,22 @@ void MotionPlan::RRT::outputTree(FILE *outStream)
     // }
 
   }
+}
+
+
+
+void MotionPlan::RRT::outputPotential(std::ostream &outStream)
+{
+  for (int i = 0; i < numObstacles; ++i) {
+    for (double x = xMin[i]-1; x <= xMax[i]+1; x+=0.05) {
+      for(double y = yMin[i]-1; y <= yMax[i]+1; y+=0.05){
+        for(double z = zMin[i]; z <= zMax[i]+1; z+=0.1){
+          outStream << x << "\t" << y << "\t" << z << "\t" << MotionPlan::f_xy(x, y, z, vobstacle) << endl;
+        }
+      }
+    }
+  }
+
 }
 
 

@@ -115,6 +115,7 @@ namespace MotionPlan
     /// Displays the RRT's nodes and edges.
     void outputTree(std::ostream& outStream);
     void outputTree(FILE *outStream);
+    void outputPotential(std::ostream &outStream);
     void OutputFinalPath(std::vector<POINT> *finalpath);
 
     /// Pointer to the root (start) node of the RRT.

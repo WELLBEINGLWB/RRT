@@ -31,6 +31,8 @@ int main(int argc, char* argv[])
 
   rrt.RRTloop(&iters, path, &pathLength, file);
   rrt.OutputFinalPath(&finalpath);
+  // std::ofstream potential("./plot_data/PotentialData.dat"); // 3次元データ＋ポテンシャルの４次元データ
+  // rrt.outputPotential(potential);
 
   #ifdef Bspline
   Sp.drowSpline(finalpath);    // 平滑化＋ポテンシャル法による経路の衝突判定β

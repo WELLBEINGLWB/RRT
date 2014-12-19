@@ -171,6 +171,7 @@ void MotionPlan::RRT::randFreeSample(double* x, double* y)
 * ~~2014.12.16 APFによる衝突判定をささっと導入した~~
 * ~~簡単な障害物に関しては簡単に成功している（割と速い）~~
 * 2014.12.18 全然見当違い。動いてねえよ！！  
+* 結局修正できてまあ動いてる
 
 ## [3. initial](https://github.com/Ry0/RRT/tree/APF_Collision_Check/initial)
 実際に適応するまえのテスト段階のソースコードたち  

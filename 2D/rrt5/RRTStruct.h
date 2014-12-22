@@ -18,7 +18,7 @@
 #include <unistd.h>
 
 // #define PlotAnimation
-#define APF
+// #define APF
 // #define Bspline
 
 // #define K 60      // 障害物のポテンシャルの高さ

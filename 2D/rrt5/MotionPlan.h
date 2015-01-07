@@ -166,7 +166,7 @@ namespace MotionPlan
 
     /// Maximum number of iterations to run when finding a path
     /// before givin up.
-    static const int MAX_ITERATIONS = 25000;
+    static const int MAX_ITERATIONS = 500000;
   };
 };
 

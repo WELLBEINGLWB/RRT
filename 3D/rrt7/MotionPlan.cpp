@@ -480,7 +480,6 @@ bool MotionPlan::RRT::findPath(int* iterations, int* nodePath, int* pathLength)
 
 void MotionPlan::RRT::RRTloop(int* iterations, int* nodePath, int* pathLength, std::ostream& nodeData)
 {
-  std::string a;
   POINT tmp;
 
   while(1){

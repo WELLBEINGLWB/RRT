@@ -11,7 +11,6 @@ bool MotionPlan::clear(double xTest, double yTest, std::vector<POINT> &vobstacle
 }
 
 
-
 bool MotionPlan::link(double xStart, double yStart,
                       double xDest, double yDest,
                       std::vector<POINT> &vobstacle, double stepSize)
@@ -58,7 +57,6 @@ bool MotionPlan::link(double xStart, double yStart,
 }
 
 
-
 // f(x,y)
 double MotionPlan::f_xy(double x,double y, std::vector<POINT> &vobstacle)
 {
@@ -69,7 +67,6 @@ double MotionPlan::f_xy(double x,double y, std::vector<POINT> &vobstacle)
   }
   return sum;
 }
-
 
 
 // childrenのsubtreesの中で(xSample, ySample, zSample)に一番近いノードを探す(再帰的に)
@@ -108,7 +105,6 @@ MotionPlan::RRT::TreeNode* MotionPlan::RRT::TreeNode::nearestNode(double xSample
 }
 
 
-
 void MotionPlan::RRT::TreeNode::deleteChildren()
 {
   std::vector<TreeNode*>::iterator child;
@@ -121,7 +117,6 @@ void MotionPlan::RRT::TreeNode::deleteChildren()
 
   children.clear();
 }
-
 
 
 MotionPlan::RRT::RRT(double* xMini, double* xMaxi, double* yMini, double* yMaxi, int numObs,
@@ -141,7 +136,6 @@ MotionPlan::RRT::RRT(double* xMini, double* xMaxi, double* yMini, double* yMaxi,
 }
 
 
-
 MotionPlan::RRT::RRT(std::string fileName):
                      root(NULL),
                      xMin(NULL), xMax(NULL),
@@ -153,7 +147,6 @@ MotionPlan::RRT::RRT(std::string fileName):
   CreateCube(file);
   srand((unsigned int)time(NULL));
 }
-
 
 
 void MotionPlan::RRT::CreatePotentialField()
@@ -255,7 +248,6 @@ MotionPlan::RRT::~RRT()
 }
 
 
-
 // For x and y, generates a random number, scales it to [0,1], then
 // scales it to the distance between the boundaries, then offsets it
 // by the left/bottom value. This effectively generates x and y values
@@ -269,13 +261,12 @@ void MotionPlan::RRT::randFreeSample(double* x, double* y)
     (*x) = xGoal;
     (*y) = yGoal;
   }else{
-    do{
+    // do{
       (*x) = (((double)rand())/RAND_MAX)*(xRight - xLeft) + xLeft;
       (*y) = (((double)rand())/RAND_MAX)*(yTop - yBottom) + yBottom;
-    } while(!clear(*x, *y, vobstacle));
+    // } while(!clear(*x, *y, vobstacle));
   }
 }
-
 
 
 // Recurses through the RRT, calling nearestNode() on each node.
@@ -288,7 +279,6 @@ MotionPlan::RRT::TreeNode* MotionPlan::RRT::nearestNode(double x, double y)
 
   return nearest;
 }
-
 
 
 // Finds the vector from the nearest node to the sample point (x,y),
@@ -304,18 +294,17 @@ MotionPlan::RRT::TreeNode* MotionPlan::RRT::genNewNode(const TreeNode* nearest, 
   double newX = nearest->x + stepSize * (dx / dist);
   double newY = nearest->y + stepSize * (dy / dist);
 
-  if (link(nearest->x, nearest->y, newX, newY, vobstacle, stepSize)){
+  // if (link(nearest->x, nearest->y, newX, newY, vobstacle, stepSize)){
 
     TreeNode* newNode = new TreeNode;
     newNode->x = newX;
     newNode->y = newY;
 
     return newNode;
-  } else{
-    return NULL;
-  }
+  // } else{
+  //   return NULL;
+  // }
 }
-
 
 
 // Checks if the square of the distance between this node and
@@ -334,6 +323,88 @@ bool MotionPlan::RRT::checkGoal(const TreeNode* checkNode)
   }
 }
 
+
+bool MotionPlan::RRT::transitionTest(const TreeNode* child, const TreeNode* parent)
+{
+  double distance;
+  double childCost, parentCost;
+
+  KConstant = (f_xy(xStart, yStart, vobstacle) + f_xy(xGoal, yGoal, vobstacle))/2.0;
+
+  distance = sqrt(pow((child->x - parent->x), 2) + pow((child->y - parent->y), 2));
+  childCost = f_xy(child->x, child->y, vobstacle);
+  parentCost = f_xy(parent->x, parent->y, vobstacle);
+  cout << "distance = " << distance << ", childCost = " << childCost << ", parentCost = " << parentCost << endl;
+
+  // Always accept if new state has same or lower cost than old state
+  if (childCost <= parentCost)
+    return true;
+
+  // Difference in cost
+  double costSlope = (childCost - parentCost) / distance;
+
+  // The probability of acceptance of a new configuration is defined by comparing its cost c_j
+  // relatively to the cost c_i of its parent in the tree. Based on the Metropolis criterion.
+  double transitionProbability = 1.; // if cost_slope is <= 0, probabilty is 1
+
+  // Only return at end
+  bool result = false;
+
+  // Calculate tranision probabilty
+  if (costSlope > 0){
+    transitionProbability = exp(-costSlope / (KConstant * Temperature));
+  }
+
+  // Check if we can accept it
+  double rand01;
+  rand01 = ((double)rand())/RAND_MAX;
+  if (rand01 <= transitionProbability){
+    if (Temperature > minTemperature){
+      Temperature /= tempChangeFactor;
+      // Prevent temp_ from getting too small
+      if (Temperature < minTemperature) {
+        Temperature = minTemperature;
+      }
+    }
+
+    numStatesFailed = 0;
+
+    result = true;
+  } else {
+    // State has failed
+    if (numStatesFailed >= maxStatesFailed) {
+      Temperature *= tempChangeFactor;
+      numStatesFailed = 0;
+    } else {
+      ++numStatesFailed;
+    }
+  }
+
+  return result;
+}
+
+
+bool MotionPlan::RRT::minExpansionControl(double randMotionDistance)
+{
+  // Decide to accept or not
+  if (randMotionDistance > frontierThreshold) {
+    // participates in the tree expansion
+    ++frontierCount;
+    return true;
+  } else {
+    // participates in the tree refinement
+    // check our ratio first before accepting it
+    if ((double)nonfrontierCount / (double)frontierCount > frontierNodeRatio){
+      // Increment so that the temperature rises faster
+      ++numStatesFailed;
+      // reject this node as being too much refinement
+      return false;
+    }else{
+      ++nonfrontierCount;
+      return true;
+    }
+  }
+}
 
 
 // First clears the tree of any info that may have been left over
@@ -392,35 +463,29 @@ bool MotionPlan::RRT::findPath(int* iterations, int* nodePath, int* pathLength)
     near = nearestNode(sampleX, sampleY);
     newNode = genNewNode(near, sampleX, sampleY);
 
-    if (newNode != NULL){
-      newNode->parent = near;
-      near->children.push_back(newNode);
+    if(transitionTest(near, newNode)){
+      if (newNode != NULL){
+        newNode->parent = near;
+        near->children.push_back(newNode);
 
-      newNode->nodeID = nodes.size();
-      nodes.push_back(newNode);
-      edges.push_back(Edge(near->nodeID, newNode->nodeID));
+        newNode->nodeID = nodes.size();
+        nodes.push_back(newNode);
+        edges.push_back(Edge(near->nodeID, newNode->nodeID));
 
-      if (checkGoal(newNode)){
-        goal = new TreeNode;
-        goal->x = xGoal;
-        goal->y = yGoal;
-        goal->parent = newNode;
-        newNode->children.push_back(goal);
-        goalReached = true;
+        if (checkGoal(newNode)){
+          goal = new TreeNode;
+          goal->x = xGoal;
+          goal->y = yGoal;
+          goal->parent = newNode;
+          newNode->children.push_back(goal);
+          goalReached = true;
 
-        goal->nodeID = nodes.size();
-        nodes.push_back(goal);
-        edges.push_back(Edge(newNode->nodeID, goal->nodeID));
+          goal->nodeID = nodes.size();
+          nodes.push_back(goal);
+          edges.push_back(Edge(newNode->nodeID, goal->nodeID));
+        }
       }
     }
-
-    // while(1){
-    //   std::string a;
-    //   std::cout << (*iterations) << "ループに進む場合は「y」を入力"<< std::endl;
-    //   std::cin >> a;
-    //   if( a == "y" ) break;
-    // }
-
 
   } // end while goal hasn't been reached
   printf("RRTは    %5dループで終了\n", (*iterations));
@@ -443,8 +508,8 @@ bool MotionPlan::RRT::findPath(int* iterations, int* nodePath, int* pathLength)
     nodePath = NULL;
     return false;
   }
-}
 
+}
 
 
 void MotionPlan::RRT::RRTloop(int* iterations, int* nodePath, int* pathLength, std::ostream& nodeData)
@@ -481,7 +546,6 @@ void MotionPlan::RRT::RRTloop(int* iterations, int* nodePath, int* pathLength, s
 }
 
 
-
 int MotionPlan::RRT::GetRandom(double min, double max)
 {
   int R;
@@ -489,7 +553,6 @@ int MotionPlan::RRT::GetRandom(double min, double max)
   R = min + (int)(rand() * ((max - min) + 1.0) / (1.0 + RAND_MAX));
   return R;
 }
-
 
 
 double MotionPlan::RRT::Distance()
@@ -507,7 +570,6 @@ double MotionPlan::RRT::Distance()
     return dis;
   }
 }
-
 
 
 void MotionPlan::RRT::smoothing(int loop)
@@ -598,7 +660,6 @@ void MotionPlan::RRT::smoothing(int loop)
 }
 
 
-
 void MotionPlan::RRT::CreateCube(std::ostream &cube)
 {
   #ifndef APF
@@ -644,7 +705,6 @@ void MotionPlan::RRT::CreateCube(std::ostream &cube)
   #endif
 
 }
-
 
 
 void MotionPlan::RRT::outputTree(std::ostream &outStream)
@@ -703,7 +763,6 @@ void MotionPlan::RRT::output_plt(string plt_output){
   plt << "\"path_data.dat\" using 1:2:3 with lines lt rgb \"#ff4500\" lw 3 title \"Before\",\\" << endl;
   plt << "\"path_data_mod.dat\" using 1:2:3 with lines lt rgb \"#66cdaa\" lw 3 title \"After\"" << endl;
 }
-
 
 
 void MotionPlan::RRT::OutputFinalPath(std::vector<POINT> *finalpath)

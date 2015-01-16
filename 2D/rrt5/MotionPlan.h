@@ -105,6 +105,9 @@ namespace MotionPlan
     /// returned.
     TreeNode* genNewNode(const TreeNode* nearest, double x, double y);
 
+    bool transitionTest(const TreeNode* child, const TreeNode* parent);
+    bool minExpansionControl(double randMotionDistance);
+
     /// Checks whether the goal position is within stepSize distance and
     /// reachable from checkNode. If so, return true. If it's too far away
     /// or if link() between checkNode and the goal fails, return false.
@@ -160,9 +163,24 @@ namespace MotionPlan
     /// ポテンシャル場を形成するための障害物点を定義するようベクター
     std::vector<POINT> vobstacle;
 
+    /// Transtion Test
+    double Temperature = 2.0;
+    double KConstant;
+    unsigned int maxStatesFailed = 100;
+    double tempChangeFactor = 2.0;
+    double minTemperature = 1.0;
+    double initTemperature;
+    unsigned int numStatesFailed;
+
+     /// Minimum Expansion Control
+    double nonfrontierCount;
+    double frontierCount;
+    double frontierThreshold;
+    double frontierNodeRatio;
+
     /// Maximum number of iterations to run when finding a path
     /// before givin up.
-    static const int MAX_ITERATIONS = 25000;
+    static const int MAX_ITERATIONS = 100000;
   };
 };
 

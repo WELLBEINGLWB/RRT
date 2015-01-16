@@ -62,9 +62,7 @@ void MotionPlan::RRT::randFreeSample(double* x, double* y)
 
 ### rrt5
 * branch、「[APF_Collision_Check](https://github.com/Ry0/RRT/tree/APF_Collision_Check/2D/rrt5)」にて衝突判定において人工ポテンシャル法を使っている。
-* ただし現段階(2014.12.15)では実行速度が幾何学的に衝突判定を行っている従来の方法と比べてかなり遅いのでそこが問題
-* (2015.1.16)T-RRTの実装を開始。
-* 参考文献：![http://www.iri.upc.edu/people/ljaillet/Papers/Iros08_TransitRRT_final.pdf](http://www.iri.upc.edu/people/ljaillet/Papers/Iros08_TransitRRT_final.pdf)  
+* ただし現段階(2014.12.15)では実行速度が幾何学的に衝突判定を行っている従来の方法と比べてかなり遅いのでそこが問題  
 
 ```cpp
   bool clear(double xTest, double yTest, std::vector<POINT> &vobstacle);
@@ -79,6 +77,8 @@ void MotionPlan::RRT::randFreeSample(double* x, double* y)
 * rrt4とくらべてスプライン関数を用いた平滑処理も加えたことから、ファイルの分割も多くなっている
 * スプライン曲線を引いたあとの衝突判定に関しても、ポテンシャル法によってある程度ぶつかっているかどうかの判定は可能（実行速度はどうだろ...）`class Draw { }`で実装
 * あとオマケ程度にプログラムの実行時の引数を指定してエラー処理をする関数を別で書いた
+* (2015.1.16)T-RRTの実装を開始。
+* 参考文献：![http://www.iri.upc.edu/people/ljaillet/Papers/Iros08_TransitRRT_final.pdf](http://www.iri.upc.edu/people/ljaillet/Papers/Iros08_TransitRRT_final.pdf)  
 
 ### rrt_check
 * 単純にrrtがどのようにゴールまで幹を伸ばしていくかっていうのを1ループごとに見るためのプログラム

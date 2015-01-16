@@ -3,7 +3,7 @@
 * RRT(Rapidly exploring Random Tree)のコード
 * 2次元版と3次元版がある
 * 最近では人工ポテンシャル場と組み合わせたやつもある
-* branchは「APF_Collision_Check」
+* branchは「T-RRT」
 
 ## [1. 2D](https://github.com/Ry0/RRT/tree/APF_Collision_Check/2D)
 RRTの2Dバージョン  
@@ -63,6 +63,7 @@ void MotionPlan::RRT::randFreeSample(double* x, double* y)
 ### rrt5
 * branch、「[APF_Collision_Check](https://github.com/Ry0/RRT/tree/APF_Collision_Check/2D/rrt5)」にて衝突判定において人工ポテンシャル法を使っている。
 * ただし現段階(2014.12.15)では実行速度が幾何学的に衝突判定を行っている従来の方法と比べてかなり遅いのでそこが問題
+* (2015.1.16)T-RRTの実装を開始。![参考文献](http://www.iri.upc.edu/people/ljaillet/Papers/Iros08_TransitRRT_final.pdf)  
 
 ```cpp
   bool clear(double xTest, double yTest, std::vector<POINT> &vobstacle);

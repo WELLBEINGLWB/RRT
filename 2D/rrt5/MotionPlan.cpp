@@ -261,10 +261,10 @@ void MotionPlan::RRT::randFreeSample(double* x, double* y)
     (*x) = xGoal;
     (*y) = yGoal;
   }else{
-    // do{
+    do{
       (*x) = (((double)rand())/RAND_MAX)*(xRight - xLeft) + xLeft;
       (*y) = (((double)rand())/RAND_MAX)*(yTop - yBottom) + yBottom;
-    // } while(!clear(*x, *y, vobstacle));
+    } while(!clear(*x, *y, vobstacle));
   }
 }
 
@@ -294,16 +294,16 @@ MotionPlan::RRT::TreeNode* MotionPlan::RRT::genNewNode(const TreeNode* nearest, 
   double newX = nearest->x + stepSize * (dx / dist);
   double newY = nearest->y + stepSize * (dy / dist);
 
-  // if (link(nearest->x, nearest->y, newX, newY, vobstacle, stepSize)){
+  if (link(nearest->x, nearest->y, newX, newY, vobstacle, stepSize)){
 
     TreeNode* newNode = new TreeNode;
     newNode->x = newX;
     newNode->y = newY;
 
     return newNode;
-  // } else{
-  //   return NULL;
-  // }
+  } else{
+    return NULL;
+  }
 }
 
 
@@ -330,11 +330,14 @@ bool MotionPlan::RRT::transitionTest(const TreeNode* child, const TreeNode* pare
   double childCost, parentCost;
 
   KConstant = (f_xy(xStart, yStart, vobstacle) + f_xy(xGoal, yGoal, vobstacle))/2.0;
+  cout << "KConstant = " << KConstant << endl;
+  KConstant = 0.5;
 
-  distance = sqrt(pow((child->x - parent->x), 2) + pow((child->y - parent->y), 2));
+  // distance = sqrt(pow((child->x - parent->x), 2) + pow((child->y - parent->y), 2));
+  distance = stepSize;
   childCost = f_xy(child->x, child->y, vobstacle);
   parentCost = f_xy(parent->x, parent->y, vobstacle);
-  cout << "distance = " << distance << ", childCost = " << childCost << ", parentCost = " << parentCost << endl;
+  cout << "childCost = " << childCost << ", parentCost = " << parentCost << endl;
 
   // Always accept if new state has same or lower cost than old state
   if (childCost <= parentCost)
@@ -353,11 +356,13 @@ bool MotionPlan::RRT::transitionTest(const TreeNode* child, const TreeNode* pare
   // Calculate tranision probabilty
   if (costSlope > 0){
     transitionProbability = exp(-costSlope / (KConstant * Temperature));
+    cout << "transitionProbability = " << transitionProbability << endl;
   }
 
   // Check if we can accept it
   double rand01;
   rand01 = ((double)rand())/RAND_MAX;
+  cout << "rand01 = " << rand01 << endl;
   if (rand01 <= transitionProbability){
     if (Temperature > minTemperature){
       Temperature /= tempChangeFactor;
@@ -463,8 +468,8 @@ bool MotionPlan::RRT::findPath(int* iterations, int* nodePath, int* pathLength)
     near = nearestNode(sampleX, sampleY);
     newNode = genNewNode(near, sampleX, sampleY);
 
-    if(transitionTest(near, newNode)){
-      if (newNode != NULL){
+    if(newNode != NULL && transitionTest(near, newNode)){
+      // if (newNode != NULL){
         newNode->parent = near;
         near->children.push_back(newNode);
 
@@ -484,7 +489,7 @@ bool MotionPlan::RRT::findPath(int* iterations, int* nodePath, int* pathLength)
           nodes.push_back(goal);
           edges.push_back(Edge(newNode->nodeID, goal->nodeID));
         }
-      }
+      // }
     }
 
   } // end while goal hasn't been reached

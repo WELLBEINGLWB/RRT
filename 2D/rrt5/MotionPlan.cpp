@@ -24,6 +24,7 @@ bool MotionPlan::link(double xStart, double yStart,
 
   double Potential;
   double MaxPotential = 0.0;
+
   // POINT MaxPoint;
   // bool flag = true;
 
@@ -162,6 +163,8 @@ void MotionPlan::RRT::CreatePotentialField()
       }
     }
   }
+  // T-RRT用の定数を計算
+  KConstant = 1000*(f_xy(xStart, yStart, vobstacle) + f_xy(xGoal, yGoal, vobstacle))/2.0;
 }
 
 
@@ -329,9 +332,8 @@ bool MotionPlan::RRT::transitionTest(const TreeNode* child, const TreeNode* pare
   double distance;
   double childCost, parentCost;
 
-  KConstant = (f_xy(xStart, yStart, vobstacle) + f_xy(xGoal, yGoal, vobstacle))/2.0;
   cout << "KConstant = " << KConstant << endl;
-  KConstant = 0.5;
+  // KConstant = 0.5;
 
   // distance = sqrt(pow((child->x - parent->x), 2) + pow((child->y - parent->y), 2));
   distance = stepSize;
@@ -340,11 +342,14 @@ bool MotionPlan::RRT::transitionTest(const TreeNode* child, const TreeNode* pare
   cout << "childCost = " << childCost << ", parentCost = " << parentCost << endl;
 
   // Always accept if new state has same or lower cost than old state
-  if (childCost <= parentCost)
+  if (childCost <= parentCost){
+    cout << "transitionProbabilityは計算しなくていい" << endl;
     return true;
+  }
 
   // Difference in cost
   double costSlope = (childCost - parentCost) / distance;
+  cout << "costSlope = " << costSlope << endl;
 
   // The probability of acceptance of a new configuration is defined by comparing its cost c_j
   // relatively to the cost c_i of its parent in the tree. Based on the Metropolis criterion.
@@ -365,9 +370,10 @@ bool MotionPlan::RRT::transitionTest(const TreeNode* child, const TreeNode* pare
   cout << "rand01 = " << rand01 << endl;
   if (rand01 <= transitionProbability){
     if (Temperature > minTemperature){
+      cout << "温度下げた！" << endl;
       Temperature /= tempChangeFactor;
       // Prevent temp_ from getting too small
-      if (Temperature < minTemperature) {
+      if (Temperature <= minTemperature) {
         Temperature = minTemperature;
       }
     }
@@ -378,6 +384,7 @@ bool MotionPlan::RRT::transitionTest(const TreeNode* child, const TreeNode* pare
   } else {
     // State has failed
     if (numStatesFailed >= maxStatesFailed) {
+      cout << "温度上げた！" << endl;
       Temperature *= tempChangeFactor;
       numStatesFailed = 0;
     } else {

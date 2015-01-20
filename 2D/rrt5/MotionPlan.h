@@ -164,19 +164,19 @@ namespace MotionPlan
     std::vector<POINT> vobstacle;
 
     /// Transtion Test
-    double Temperature = 2.0;
+    double Temperature = 0.01;
     double KConstant;
-    unsigned int maxStatesFailed = 100;
+    unsigned int maxStatesFailed = 2;
     double tempChangeFactor = 2.0;
-    double minTemperature = 1.0;
-    double initTemperature;
+    double minTemperature = 0.1;
+    double initTemperature = 10e-6;
     unsigned int numStatesFailed;
 
      /// Minimum Expansion Control
-    double nonfrontierCount;
-    double frontierCount;
-    double frontierThreshold;
-    double frontierNodeRatio;
+    double nonfrontierCount = 1;
+    double frontierCount = 1;
+    double frontierThreshold = 0.0;
+    double frontierNodeRatio = 0.1;
 
     /// Maximum number of iterations to run when finding a path
     /// before givin up.

@@ -2,7 +2,7 @@
 
 /// Simple iterates over each object in the space
 /// and checks whether the test point lies inside the obstacle.
-bool MotionPlan::clear(double xTest, double yTest, std::vector<POINT> &vobstacle){
+bool MotionPlan::RRT::clear(double xTest, double yTest, std::vector<POINT> &vobstacle){
   if(f_xy(xTest, yTest, vobstacle) > Threshold){
     return false;
   }else{
@@ -11,7 +11,7 @@ bool MotionPlan::clear(double xTest, double yTest, std::vector<POINT> &vobstacle
 }
 
 
-bool MotionPlan::link(double xStart, double yStart,
+bool MotionPlan::RRT::link(double xStart, double yStart,
                       double xDest, double yDest,
                       std::vector<POINT> &vobstacle, double stepSize)
 {
@@ -59,13 +59,14 @@ bool MotionPlan::link(double xStart, double yStart,
 
 
 // f(x,y)
-double MotionPlan::f_xy(double x,double y, std::vector<POINT> &vobstacle)
+double MotionPlan::RRT::f_xy(double x,double y, std::vector<POINT> &vobstacle)
 {
   double sum = 0.0;
 
   for (size_t i = 0, size = vobstacle.size(); i < size; ++i){
     sum += K*exp(-r_1*pow(x-vobstacle[i].x, 2) - r_2*pow(y-vobstacle[i].y, 2));
   }
+  // sum = sum + K_1*(pow(x-xGoal, 2) + pow(y-yGoal, 2));
   return sum;
 }
 
@@ -542,7 +543,7 @@ void MotionPlan::RRT::RRTloop(int* iterations, int* nodePath, int* pathLength, s
       std::ofstream pathData("./plot_data/path_data.dat", std::ios_base::trunc);
       for(unsigned int addpath = 0; addpath < paths.size(); addpath++ ){
         #ifdef APF
-        pathData << paths[addpath].x << "\t" << paths[addpath].y << "\t" << MotionPlan::f_xy(paths[addpath].x, paths[addpath].y, vobstacle) << std::endl;
+        pathData << paths[addpath].x << "\t" << paths[addpath].y << "\t" << f_xy(paths[addpath].x, paths[addpath].y, vobstacle) << std::endl;
         #else
         pathData << paths[addpath].x << "\t" << paths[addpath].y << std::endl;
         #endif
@@ -630,7 +631,7 @@ void MotionPlan::RRT::smoothing(int loop)
       std::ofstream outStream("./plot_data/path_data_mod.dat", std::ios_base::trunc);
       for (unsigned int k = 0; k < paths.size(); k++) {
         #ifdef APF
-        outStream << paths[k].x << "\t" << paths[k].y << "\t" << MotionPlan::f_xy(paths[k].x, paths[k].y, vobstacle) << std::endl;
+        outStream << paths[k].x << "\t" << paths[k].y << "\t" << f_xy(paths[k].x, paths[k].y, vobstacle) << std::endl;
         #else
         outStream << paths[k].x << "\t" << paths[k].y << std::endl;
         #endif
@@ -684,8 +685,8 @@ void MotionPlan::RRT::CreateCube(std::ostream &cube)
   std::ofstream splineData("./plot_data/Bspline.dat", std::ios_base::trunc);
 
   #ifdef APF
-  plot << xStart << "\t" << yStart << "\t" << MotionPlan::f_xy(xStart, yStart, vobstacle) << std::endl;
-  plot << xGoal << "\t" << yGoal << "\t" << MotionPlan::f_xy(xGoal, yGoal, vobstacle) << std::endl;
+  plot << xStart << "\t" << yStart << "\t" << f_xy(xStart, yStart, vobstacle) << std::endl;
+  plot << xGoal << "\t" << yGoal << "\t" << f_xy(xGoal, yGoal, vobstacle) << std::endl;
   output_plt("./plot_data/APFplot.plt");
   #else
   plot << xStart << "\t" << yStart << std::endl;
@@ -732,8 +733,8 @@ void MotionPlan::RRT::outputTree(std::ostream &outStream)
     tmp[0].y = (nodes[edges[i].node1])->y;
     tmp[1].x = (nodes[edges[i].node2])->x;
     tmp[1].y = (nodes[edges[i].node2])->y;
-    outStream << tmp[0].x << "\t" << tmp[0].y << "\t" << MotionPlan::f_xy(tmp[0].x, tmp[0].y, vobstacle) << std::endl;
-    outStream << tmp[1].x << "\t" << tmp[1].y << "\t" << MotionPlan::f_xy(tmp[1].x, tmp[1].y, vobstacle) << std::endl;
+    outStream << tmp[0].x << "\t" << tmp[0].y << "\t" << f_xy(tmp[0].x, tmp[0].y, vobstacle) << std::endl;
+    outStream << tmp[1].x << "\t" << tmp[1].y << "\t" << f_xy(tmp[1].x, tmp[1].y, vobstacle) << std::endl;
     #else
     outStream << (nodes[edges[i].node1])->x << "\t" << (nodes[edges[i].node1])->y << std::endl;
     outStream << (nodes[edges[i].node2])->x << "\t" << (nodes[edges[i].node2])->y << std::endl;

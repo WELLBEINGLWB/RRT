@@ -6,23 +6,22 @@
 
 namespace MotionPlan
 {
-  /// Checks whether a point (xTest,yTest) is in collision
-  /// with any of the obstacles defined by their min/max coordinates.
-  bool clear(double xTest, double yTest, std::vector<POINT> &vobstacle);
-
-  /// A geometrically exact query for whether the line between
-  /// points (xStart,yStart) and (xDest,yDest) collides with any
-  /// of the obstacles defined by their mein/max coordinates
-  bool link(double xStart, double yStart,
-            double xDest, double yDest,
-            std::vector<POINT> &vobstacle, double stepSize);
-
-  double f_xy(double x,double y, std::vector<POINT> &vobstacle);
-
 
   class RRT
   {
   public:
+    /// Checks whether a point (xTest,yTest) is in collision
+    /// with any of the obstacles defined by their min/max coordinates.
+    bool clear(double xTest, double yTest, std::vector<POINT> &vobstacle);
+
+    /// A geometrically exact query for whether the line between
+    /// points (xStart,yStart) and (xDest,yDest) collides with any
+    /// of the obstacles defined by their mein/max coordinates
+    bool link(double xStart, double yStart,
+              double xDest, double yDest,
+              std::vector<POINT> &vobstacle, double stepSize);
+
+    double f_xy(double x,double y, std::vector<POINT> &vobstacle);
 
     /// Represents a node in an RRT
     /// Stores its own positional information, as well as

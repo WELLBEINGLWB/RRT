@@ -2,26 +2,25 @@
 #define _MOTION_PLAN_H_
 #include "RRTStruct.h"
 
-#define Threshold 0.5
+#define Threshold 1
 
 namespace MotionPlan
 {
-
   class RRT
   {
   public:
     /// Checks whether a point (xTest,yTest) is in collision
     /// with any of the obstacles defined by their min/max coordinates.
-    bool clear(double xTest, double yTest, std::vector<POINT> &vobstacle);
+    bool clear(double xTest, double yTest);
 
     /// A geometrically exact query for whether the line between
     /// points (xStart,yStart) and (xDest,yDest) collides with any
     /// of the obstacles defined by their mein/max coordinates
     bool link(double xStart, double yStart,
               double xDest, double yDest,
-              std::vector<POINT> &vobstacle, double stepSize);
+              double stepSize);
 
-    double f_xy(double x,double y, std::vector<POINT> &vobstacle);
+    double f_xy(double x,double y);
 
     /// Represents a node in an RRT
     /// Stores its own positional information, as well as
@@ -29,7 +28,7 @@ namespace MotionPlan
     class TreeNode
     {
     public:
-      double x, y, z;
+      double x, y;
       std::vector<TreeNode*> children;
       TreeNode* parent;
 
@@ -163,9 +162,9 @@ namespace MotionPlan
     std::vector<POINT> vobstacle;
 
     /// Transtion Test
-    double Temperature = 0.01;
+    double Temperature = 100;
     double KConstant;
-    unsigned int maxStatesFailed = 2;
+    unsigned int maxStatesFailed = 3.0;
     double tempChangeFactor = 2.0;
     double minTemperature = 0.1;
     double initTemperature = 10e-6;

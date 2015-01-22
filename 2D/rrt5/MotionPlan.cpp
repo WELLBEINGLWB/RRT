@@ -363,33 +363,40 @@ bool MotionPlan::RRT::checkGoal(const TreeNode* checkNode)
   }
 }
 
-
+// #define ChecktransitionTest
 bool MotionPlan::RRT::transitionTest(const TreeNode* child, const TreeNode* parent)
 {
   double distance;
   double childCost, parentCost;
 
   // KConstantはスタートとゴールのポテンシャルによってきまる
+  #ifdef ChecktransitionTest
   cout << "KConstant = " << KConstant << endl;
 
   cout << "Temperature = " << Temperature << endl;
+  #endif
 
   distance = stepSize;
   // 親ノードと子ノードのコスト計算
   childCost = f_xy(child->x, child->y);
   parentCost = f_xy(parent->x, parent->y);
+  #ifdef ChecktransitionTest
   cout << "childCost = " << childCost << ", parentCost = " << parentCost << endl;
+  #endif
 
   // もし，親ノードより子ノードがコストが低かったら
   if (childCost <= parentCost){
+    #ifdef ChecktransitionTest
     cout << "transitionProbabilityは計算しなくていい" << endl;
+    #endif
     return true;
   }
 
   // コストの差と距離を計算
   double costSlope = (childCost - parentCost) / distance;
+  #ifdef ChecktransitionTest
   cout << "costSlope = " << costSlope << endl;
-
+  #endif
   double transitionProbability = 1.; // if cost_slope is <= 0, probabilty is 1
 
   // falseで初期化
@@ -398,17 +405,22 @@ bool MotionPlan::RRT::transitionTest(const TreeNode* child, const TreeNode* pare
   // 確率計算
   if (costSlope > 0){
     transitionProbability = exp(-costSlope / (KConstant * Temperature));
+    #ifdef ChecktransitionTest
     cout << "transitionProbability = " << transitionProbability << endl;
+    #endif
   }
 
   // Check if we can accept it
   double rand01;
   rand01 = ((double)rand())/RAND_MAX;
+  #ifdef ChecktransitionTest
   cout << "rand01 = " << rand01 << endl;
-
+  #endif
   if (rand01 <= transitionProbability){
     if (Temperature > minTemperature){
+      #ifdef ChecktransitionTest
       cout << "温度下げた！" << endl;
+      #endif
       Temperature /= tempChangeFactor;
       // Temperatureが小さ過ぎたら
       if (Temperature <= minTemperature) {
@@ -422,7 +434,9 @@ bool MotionPlan::RRT::transitionTest(const TreeNode* child, const TreeNode* pare
   } else {
     // State has failed
     if (numStatesFailed >= maxStatesFailed) {
+      #ifdef ChecktransitionTest
       cout << "温度上げた！" << endl;
+      #endif
       Temperature *= tempChangeFactor;
       numStatesFailed = 0;
     } else {
@@ -591,9 +605,12 @@ void MotionPlan::RRT::RRTloop(int* iterations, int* nodePath, int* pathLength, s
       std::cout << "Path not found." << std::endl;
     }
   }
+  #ifdef CalcPotential
   CalcCost(2);
-  smoothing(50000);
-
+  #endif
+  #ifdef Smooth
+  smoothing(10000);
+  #endif
 }
 
 

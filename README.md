@@ -5,7 +5,7 @@
 * 最近では人工ポテンシャル場と組み合わせたやつもある
 * branchは「T-RRT」
 
-## [1. 2D](https://github.com/Ry0/RRT/tree/APF_Collision_Check/2D)
+## [1. 2D](https://github.com/Ry0/RRT/tree/T-RRT/2D)
 RRTの2Dバージョン  
 RRTをやり始めた最初のプログラムもあるし、RRTの原理を説明するための幹を伸ばす一連を1ループごとにプロットするプログラムもあり  
 rrt5が一番まともかな  
@@ -61,7 +61,7 @@ void MotionPlan::RRT::randFreeSample(double* x, double* y)
 * 障害物が動いても対応できるようなものも多少作っている。ロボットアームがどこまで動いているかっていうのが全く定義しきれていないから、実際には使えない。
 
 ### rrt5
-* branch、「[APF_Collision_Check](https://github.com/Ry0/RRT/tree/APF_Collision_Check/2D/rrt5)」にて衝突判定において人工ポテンシャル法を使っている。
+* branch、「[T-RRT](https://github.com/Ry0/RRT/tree/T-RRT/2D/rrt5)」にて衝突判定において人工ポテンシャル法を使って、さらにT-RRTの概念を導入。
 * ただし現段階(2014.12.15)では実行速度が幾何学的に衝突判定を行っている従来の方法と比べてかなり遅いのでそこが問題  
 
 ```cpp
@@ -77,8 +77,20 @@ void MotionPlan::RRT::randFreeSample(double* x, double* y)
 * rrt4とくらべてスプライン関数を用いた平滑処理も加えたことから、ファイルの分割も多くなっている
 * スプライン曲線を引いたあとの衝突判定に関しても、ポテンシャル法によってある程度ぶつかっているかどうかの判定は可能（実行速度はどうだろ...）`class Draw { }`で実装
 * あとオマケ程度にプログラムの実行時の引数を指定してエラー処理をする関数を別で書いた
-* (2015.1.16)T-RRTの実装を開始。
-* 参考文献：![http://www.iri.upc.edu/people/ljaillet/Papers/Iros08_TransitRRT_final.pdf](http://www.iri.upc.edu/people/ljaillet/Papers/Iros08_TransitRRT_final.pdf)  
+* (2015.1.16) T-RRTの実装を開始。
+* 参考文献：[http://www.iri.upc.edu/people/ljaillet/Papers/Iros08_TransitRRT_final.pdf](http://www.iri.upc.edu/people/ljaillet/Papers/Iros08_TransitRRT_final.pdf)  
+* (2015.1.22) T-RRTとRRTの経路のコストを計算する関数を設定
+
+```cpp
+void MotionPlan::RRT::CalcCost(int num){
+  /*〜〜〜略〜〜〜*/
+  cout << "MaxCost = " << MaxCost << endl;
+  cout << "AveCost = " << AveCost << endl;
+  cout << "SumCost = " << SumCost << endl;
+}
+```
+* 項目はコストの最大値、平均値、合計、どの指標に関してもT-RRTが勝ち！でも時間はかかっている。でもコストが低いってことは安全な経路を計画しているってこと。
+
 
 ### rrt_check
 * 単純にrrtがどのようにゴールまで幹を伸ばしていくかっていうのを1ループごとに見るためのプログラム
@@ -89,7 +101,7 @@ void MotionPlan::RRT::randFreeSample(double* x, double* y)
 * なんか残念
 
 
-## [2. 3D](https://github.com/Ry0/RRT/tree/APF_Collision_Check/3D)
+## [2. 3D](https://github.com/Ry0/RRT/tree/T-RRT/3D)
 * 2Dでやったことを3次元に拡張したやつ
 * 2Dでやってきたノウハウを活かしたものが多い
 * 3次元での衝突判定は2次元のときと都合が違ってくるので、そこは大きく変更している
@@ -176,7 +188,7 @@ void MotionPlan::RRT::randFreeSample(double* x, double* y)
 * 2014.12.18 全然見当違い。動いてねえよ！！  
 * 結局修正できてまあ動いてる
 
-## [3. initial](https://github.com/Ry0/RRT/tree/APF_Collision_Check/initial)
+## [3. initial](https://github.com/Ry0/RRT/tree/T-RRT/initial)
 実際に適応するまえのテスト段階のソースコードたち  
 3次元の衝突判定だったり、経路の洗練の部分だったり、スプライン処理だったり、APFの衝突判定だったり...
 

@@ -1,4 +1,5 @@
-APFplot.plt
+/APFplot.plt
+/plot_check.plt
 /Bspline.dat
 /PotentialData.dat
 /data.dat
@@ -7,3 +8,4 @@ APFplot.plt
 /start_goal.dat
 /PotentialData.dat
 /testcase1_obstacle.dat
+/digitaldata.dat

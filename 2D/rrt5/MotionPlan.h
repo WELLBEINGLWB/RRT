@@ -2,7 +2,7 @@
 #define _MOTION_PLAN_H_
 #include "RRTStruct.h"
 
-#define Threshold 1
+#define Threshold 0.9
 
 namespace MotionPlan
 {
@@ -67,6 +67,9 @@ namespace MotionPlan
 
     /// ポテンシャル場の定義
     void CreatePotentialField();
+
+    /// ポテンシャルの評価用関数
+    void CalcCost(int num);
 
     /// Destructor
     ~RRT();

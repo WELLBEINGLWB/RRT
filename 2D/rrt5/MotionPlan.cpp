@@ -169,6 +169,42 @@ void MotionPlan::RRT::CreatePotentialField()
 }
 
 
+void MotionPlan::RRT::CalcCost(int num){
+  double dx,dy;
+  POINT newP;
+  std::vector<POINT> DigitalPoint;
+  double MaxCost = 0.0;
+  double AveCost = 0.0;
+  double SumCost = 0.0;
+  double Cost;
+  for(unsigned int i = 0; i < paths.size()-1; i++ ){
+    dx = paths[i+1].x - paths[i].x;
+    dy = paths[i+1].y - paths[i].y;
+    for (int j = 0; j < num; ++j){
+      newP.x = paths[i].x + j * (dx / num);
+      newP.y = paths[i].y + j * (dy / num);
+      DigitalPoint.push_back(newP);
+    }
+  }
+  newP.x = paths[paths.size()-1].x;
+  newP.y = paths[paths.size()-1].y;
+  DigitalPoint.push_back(newP);
+  std::ofstream plot("./plot_data/digitaldata.dat");
+  for (unsigned int i = 0; i < DigitalPoint.size(); i++ ){
+    Cost = f_xy(DigitalPoint[i].x, DigitalPoint[i].y);
+    SumCost += Cost;
+    if(Cost > MaxCost){
+      MaxCost = Cost;
+    }
+    plot << DigitalPoint[i].x << "\t" << DigitalPoint[i].y << std::endl;
+  }
+  AveCost = SumCost / DigitalPoint.size();
+  cout << "MaxCost = " << MaxCost << endl;
+  cout << "AveCost = " << AveCost << endl;
+  cout << "SumCost = " << SumCost << endl;
+}
+
+
 // Reads initialization info for this RRT from a file with the
 // following format:
 // xLeft
@@ -555,6 +591,7 @@ void MotionPlan::RRT::RRTloop(int* iterations, int* nodePath, int* pathLength, s
       std::cout << "Path not found." << std::endl;
     }
   }
+  CalcCost(2);
   smoothing(50000);
 
 }

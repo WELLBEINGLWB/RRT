@@ -229,9 +229,11 @@ MotionPlan::RRT::RRT(std::string fileName):
                      yMin(NULL), yMax(NULL)
 {
   initFromFile(fileName);
-  // CreatePotentialField();
   std::ofstream file("./plot_data/testcase1_obstacle.dat");
   CreateCube(file);
+  #ifdef CalcPotential
+  CreatePotentialField();
+  #endif
   srand((unsigned int)time(NULL));
 }
 
@@ -594,9 +596,12 @@ void MotionPlan::RRT::RRTloop(int* iterations, int* nodePath, int* pathLength, s
       std::cout << "Path not found." << std::endl;
     }
   }
+  #ifdef CalcPotential
   CalcCost(2);
+  #endif
+  #ifdef Smooth
   smoothing(10000);
-
+  #endif
 }
 
 

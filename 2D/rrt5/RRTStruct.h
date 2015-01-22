@@ -18,8 +18,8 @@
 #include <unistd.h>
 
 // #define PlotAnimation
-// #define APF
-// #define Bspline
+ #define APF
+ #define Bspline
 
 #define K 1      // 障害物のポテンシャルの高さ
 #define K_1 0.001      // 引力のポテンシャルの高さ

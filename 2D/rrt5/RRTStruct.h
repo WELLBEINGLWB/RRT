@@ -17,7 +17,7 @@
 #include <sys/time.h>
 #include <unistd.h>
 
-// #define Bspline
+#define Bspline
 // #define PlotAnimation
 
 

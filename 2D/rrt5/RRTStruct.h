@@ -17,11 +17,15 @@
 #include <sys/time.h>
 #include <unistd.h>
 
-#define Bspline
+// #define Bspline
 // #define PlotAnimation
 
-
 using namespace std;
+
+#define K 1      // 障害物のポテンシャルの高さ
+#define K_1 0.001      // 引力のポテンシャルの高さ
+#define r_1 2     // ポテンシャルのx軸方向の大きさ
+#define r_2 2     // ポテンシャルのy軸方向の大きさ
 
 typedef struct{
   double x;

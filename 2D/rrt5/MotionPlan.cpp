@@ -177,6 +177,18 @@ MotionPlan::RRT::TreeNode* MotionPlan::RRT::TreeNode::nearestNode(double xSample
 }
 
 
+// f(x,y)
+double MotionPlan::RRT::f_xy(double x,double y)
+{
+  double sum = 0.0;
+
+  for (size_t i = 0, size = vobstacle.size(); i < size; ++i){
+    sum += K*exp(-r_1*pow(x-vobstacle[i].x, 2) - r_2*pow(y-vobstacle[i].y, 2));
+  }
+  sum = sum + K_1*(pow(x-xGoal, 2) + pow(y-yGoal, 2));
+  return sum;
+}
+
 
 void MotionPlan::RRT::TreeNode::deleteChildren()
 {
@@ -217,12 +229,68 @@ MotionPlan::RRT::RRT(std::string fileName):
                      yMin(NULL), yMax(NULL)
 {
   initFromFile(fileName);
+  // CreatePotentialField();
   std::ofstream file("./plot_data/testcase1_obstacle.dat");
   CreateCube(file);
   srand((unsigned int)time(NULL));
 }
 
 
+void MotionPlan::RRT::CreatePotentialField()
+{
+  POINT tmp;
+  std::cout << "ポテンシャル場の作成" << std::endl;
+  for (int i = 0; i < numObstacles; ++i) {
+    for (double x = xMin[i]; x <= xMax[i]; ++x) {
+      for(double y = yMin[i]; y <= yMax[i]; ++y){
+        tmp.x = x; tmp.y = y;
+        vobstacle.push_back(tmp);
+      }
+    }
+  }
+  // T-RRT用の定数を計算
+  // KConstant = 10000*(f_xy(xStart, yStart) + f_xy(xGoal, yGoal))/2.0;
+}
+
+void MotionPlan::RRT::CalcCost(int num){
+  double dx,dy;
+  POINT newP;
+  std::vector<POINT> DigitalPoint;
+  double MaxCost = 0.0;
+  double AveCost = 0.0;
+  double SumCost = 0.0;
+  double Cost;
+
+  for(unsigned int i = 0; i < paths.size()-1; i++ ){
+    dx = paths[i+1].x - paths[i].x;
+    dy = paths[i+1].y - paths[i].y;
+
+    for (int j = 0; j < num; ++j){
+      newP.x = paths[i].x + j * (dx / num);
+      newP.y = paths[i].y + j * (dy / num);
+      DigitalPoint.push_back(newP);
+    }
+  }
+  newP.x = paths[paths.size()-1].x;
+  newP.y = paths[paths.size()-1].y;
+  DigitalPoint.push_back(newP);
+
+
+  std::ofstream plot("./plot_data/digitaldata.dat");
+  for (unsigned int i = 0; i < DigitalPoint.size(); i++ ){
+    Cost = f_xy(DigitalPoint[i].x, DigitalPoint[i].y);
+    SumCost += Cost;
+    if(Cost > MaxCost){
+      MaxCost = Cost;
+    }
+    plot << DigitalPoint[i].x << "\t" << DigitalPoint[i].y << std::endl;
+  }
+  AveCost = SumCost / DigitalPoint.size();
+
+  cout << "MaxCost = " << MaxCost << endl;
+  cout << "AveCost = " << AveCost << endl;
+  cout << "SumCost = " << SumCost << endl;
+}
 
 // Reads initialization info for this RRT from a file with the
 // following format:
@@ -526,6 +594,7 @@ void MotionPlan::RRT::RRTloop(int* iterations, int* nodePath, int* pathLength, s
       std::cout << "Path not found." << std::endl;
     }
   }
+  CalcCost(2);
   smoothing(10000);
 
 }

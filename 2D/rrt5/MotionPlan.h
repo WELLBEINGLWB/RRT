@@ -33,6 +33,8 @@ namespace MotionPlan
   class RRT
   {
   public:
+    // f(x,y)
+    double f_xy(double x,double y);
 
     /// Represents a node in an RRT
     /// Stores its own positional information, as well as
@@ -76,6 +78,12 @@ namespace MotionPlan
 
     /// Initializes the RRT as above, except uses data from a file to do so.
     RRT(std::string fileName);
+
+    /// ポテンシャル場の定義
+    void CreatePotentialField();
+
+    /// ポテンシャルの評価用関数
+    void CalcCost(int num);
 
     /// Destructor
     ~RRT();
@@ -163,6 +171,9 @@ namespace MotionPlan
 
     /// RRTの最終的な経路の座標データ
     std::vector<POINT> paths;
+
+     /// ポテンシャル場を形成するための障害物点を定義するようベクター
+    std::vector<POINT> vobstacle;
 
     /// Maximum number of iterations to run when finding a path
     /// before givin up.

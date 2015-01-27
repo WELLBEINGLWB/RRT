@@ -355,28 +355,26 @@ MotionPlan::RRT::~RRT()
     root = NULL;
   }
 
-  if (xMin != NULL){
-    delete [] xMin;
+  if (xMin != NULL) {
+    delete[] xMin;
     xMin = NULL;
   }
 
-  if (xMax != NULL){
-    delete [] xMax;
+  if (xMax != NULL) {
+    delete[] xMax;
     xMax = NULL;
   }
 
-  if (yMin != NULL){
-    delete [] yMin;
+  if (yMin != NULL) {
+    delete[] yMin;
     yMin = NULL;
   }
 
-  if (yMax != NULL){
-    delete [] yMax;
+  if (yMax != NULL) {
+    delete[] yMax;
     yMax = NULL;
   }
 }
-
-
 
 // For x and y, generates a random number, scales it to [0,1], then
 // scales it to the distance between the boundaries, then offsets it
@@ -387,14 +385,14 @@ void MotionPlan::RRT::randFreeSample(double* x, double* y)
 {
   int roulette;
   roulette = (((double)rand())/RAND_MAX)*100;
-  if(roulette >= 90){
+  if (roulette >= 90){
     (*x) = xGoal;
     (*y) = yGoal;
-  }else{
-    do{
+  } else {
+    do {
       (*x) = (((double)rand())/RAND_MAX)*(xRight - xLeft) + xLeft;
       (*y) = (((double)rand())/RAND_MAX)*(yTop - yBottom) + yBottom;
-    } while(!clear(xMin, xMax, yMin, yMax, numObstacles, *x, *y));
+    } while (!clear(xMin, xMax, yMin, yMax, numObstacles, *x, *y));
   }
 }
 

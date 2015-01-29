@@ -397,7 +397,7 @@ bool MotionPlan::RRT::transitionTest(const TreeNode* child, const TreeNode* pare
   #ifdef ChecktransitionTest
   cout << "costSlope = " << costSlope << endl;
   #endif
-  double transitionProbability = 1.; // if cost_slope is <= 0, probabilty is 1
+  double transitionProbability = 1.0; // if cost_slope is <= 0, probabilty is 1
 
   // falseで初期化
   bool result = false;

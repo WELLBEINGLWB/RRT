@@ -313,7 +313,7 @@ void MotionPlan::RRT::Evaluation(int num){
 
   // 評価データを保存
   time_t t = time(NULL);
-  strftime(savefilename, sizeof(savefilename), "./evaluation_data/Evaluate_20%y.%m.%d_%H:%M:%S.dat", localtime(&t));
+  strftime(savefilename, sizeof(savefilename), "./evaluation_data/RRT/Evaluate_20%y.%m.%d_%H:%M:%S.dat", localtime(&t));
   std::ofstream data(savefilename);
 
   data << "Length = " << Wd << endl;

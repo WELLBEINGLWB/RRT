@@ -254,14 +254,17 @@ void MotionPlan::RRT::CreatePotentialField()
   // KConstant = 10000*(f_xy(xStart, yStart) + f_xy(xGoal, yGoal))/2.0;
 }
 
-void MotionPlan::RRT::CalcCost(int num){
+void MotionPlan::RRT::Evaluation(int num){
   double dx,dy;
   POINT newP;
   std::vector<POINT> DigitalPoint;
   double MaxCost = 0.0;
   double AveCost = 0.0;
   double SumCost = 0.0;
-  double Cost;
+  double CostCurrent, CostOld, CostDiff;
+  double W = 0.0, Wc = 0.0, Wd = 0.0;
+  double d;
+  double S_sum = 0.0, sigma = 0.0;
 
   for(unsigned int i = 0; i < paths.size()-1; i++ ){
     dx = paths[i+1].x - paths[i].x;
@@ -277,21 +280,57 @@ void MotionPlan::RRT::CalcCost(int num){
   newP.y = paths[paths.size()-1].y;
   DigitalPoint.push_back(newP);
 
-
   std::ofstream plot("./plot_data/digitaldata.dat");
   for (unsigned int i = 0; i < DigitalPoint.size(); i++ ){
-    Cost = f_xy(DigitalPoint[i].x, DigitalPoint[i].y);
-    SumCost += Cost;
-    if(Cost > MaxCost){
-      MaxCost = Cost;
+    CostCurrent = f_xy(DigitalPoint[i].x, DigitalPoint[i].y);
+    // コストの合計
+    SumCost += CostCurrent;
+    // コストの最大値計算
+    if(CostCurrent > MaxCost){
+      MaxCost = CostCurrent;
+    }
+    // JailletのW(p)
+    if(i > 0){
+      CostDiff = CostCurrent - CostOld;
+      d = sqrt(pow(DigitalPoint[i].x-DigitalPoint[i-1].x, 2) + pow(DigitalPoint[i].y-DigitalPoint[i-1].y, 2));
+      Wc += CostDiff * d;
+      Wd += d;
     }
     plot << DigitalPoint[i].x << "\t" << DigitalPoint[i].y << std::endl;
+    CostOld = CostCurrent;
   }
+  // JailletのW(p)
+  W = Wc + 0.1*Wd;
+
+  // コストの平均値
   AveCost = SumCost / DigitalPoint.size();
 
+  // コストの標準偏差
+  for (unsigned int i = 0; i < DigitalPoint.size(); i++ ){
+    S_sum += pow((f_xy(DigitalPoint[i].x, DigitalPoint[i].y) - AveCost),2);
+  }
+  sigma = sqrt(S_sum/DigitalPoint.size());
+
+  // 評価データを保存
+  time_t t = time(NULL);
+  strftime(savefilename, sizeof(savefilename), "./evaluation_data/Evaluate_20%y.%m.%d_%H:%M:%S.dat", localtime(&t));
+  std::ofstream data(savefilename);
+
+  data << "Length = " << Wd << endl;
+  data << "MaxCost = " << MaxCost << endl;
+  data << "AveCost = " << AveCost << endl;
+  data << "SumCost = " << SumCost << endl;
+  data << "W(p) = " << W << endl;
+  data << "S = " << sigma << endl;
+  data << "Num of Point = " << paths.size() << endl;
+
+  cout << "Length = " << Wd << endl;
   cout << "MaxCost = " << MaxCost << endl;
   cout << "AveCost = " << AveCost << endl;
   cout << "SumCost = " << SumCost << endl;
+  cout << "W(p) = " << W << endl;
+  cout << "S = " << sigma << endl;
+  cout << "Num of Point = " << paths.size() << endl;
 }
 
 // Reads initialization info for this RRT from a file with the
@@ -594,8 +633,8 @@ void MotionPlan::RRT::RRTloop(int* iterations, int* nodePath, int* pathLength, s
       std::cout << "Path not found." << std::endl;
     }
   }
-  #ifdef CalcPotential
-  CalcCost(2);
+  #ifdef Evaluate
+  Evaluation(2);
   #endif
   #ifdef Smooth
   smoothing(10000);

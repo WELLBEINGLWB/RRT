@@ -40,6 +40,11 @@ int main(int argc, char* argv[])
   #ifndef PlotAnimation
   gettimeofday(&end, NULL);    // 計測終了時間
   cout << "RRTの実行時間は " << (end.tv_sec - start.tv_sec) + (end.tv_usec - start.tv_usec)*1.0E-6 << "[s]でした。" << endl;
+  #ifdef Evaluate
+  std::ofstream data(rrt.savefilename, ios::app);
+  data << "Time = " << (end.tv_sec - start.tv_sec) + (end.tv_usec - start.tv_usec)*1.0E-6 << "[s]" << endl;
+  cout << "評価データは「" << rrt.savefilename << "」に保存されました。" << endl;
+  #endif
   #endif
 
   return 0;

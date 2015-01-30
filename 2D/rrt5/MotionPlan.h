@@ -82,8 +82,9 @@ namespace MotionPlan
     /// ポテンシャル場の定義
     void CreatePotentialField();
 
-    /// ポテンシャルの評価用関数
-    void CalcCost(int num);
+    /// 評価用関数
+    void Evaluation(int num);
+    char savefilename[64] = {'\0'};
 
     /// Destructor
     ~RRT();

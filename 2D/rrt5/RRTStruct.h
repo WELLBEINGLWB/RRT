@@ -19,7 +19,7 @@
 
 // #define Bspline
 // #define PlotAnimation
-#define CalcPotential
+#define Evaluate
 // #define Smooth
 
 using namespace std;

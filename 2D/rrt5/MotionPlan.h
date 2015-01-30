@@ -69,7 +69,8 @@ namespace MotionPlan
     void CreatePotentialField();
 
     /// ポテンシャルの評価用関数
-    void CalcCost(int num);
+    void Evaluation(int num);
+    char savefilename[64] = {'\0'};
 
     /// Destructor
     ~RRT();

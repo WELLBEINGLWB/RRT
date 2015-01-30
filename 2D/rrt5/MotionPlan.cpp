@@ -177,9 +177,9 @@ void MotionPlan::RRT::Evaluation(int num){
   double AveCost = 0.0;
   double SumCost = 0.0;
   double CostCurrent, CostOld, CostDiff;
-  double W = 0.0, Wc = 0.0, Wd = 0.0;
+  double W, Wc = 0.0, Wd = 0.0;
   double d;
-  double S_sum = 0.0, sigma = 0.0;
+  double S_sum = 0.0, sigma;
 
   for(unsigned int i = 0; i < paths.size()-1; i++ ){
     dx = paths[i+1].x - paths[i].x;

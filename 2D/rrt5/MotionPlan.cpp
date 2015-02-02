@@ -292,6 +292,9 @@ void MotionPlan::RRT::Evaluation(int num){
     // JailletのW(p)
     if(i > 0){
       CostDiff = CostCurrent - CostOld;
+      if(CostDiff <= 0){
+        CostDiff = 0;
+      }
       d = sqrt(pow(DigitalPoint[i].x-DigitalPoint[i-1].x, 2) + pow(DigitalPoint[i].y-DigitalPoint[i-1].y, 2));
       Wc += CostDiff * d;
       Wd += d;

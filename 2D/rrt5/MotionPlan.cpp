@@ -231,7 +231,7 @@ MotionPlan::RRT::RRT(std::string fileName):
   initFromFile(fileName);
   std::ofstream file("./plot_data/testcase1_obstacle.dat");
   CreateCube(file);
-  #ifdef CalcPotential
+  #ifdef Evaluate
   CreatePotentialField();
   #endif
   srand((unsigned int)time(NULL));

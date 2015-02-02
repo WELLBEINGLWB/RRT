@@ -2,7 +2,7 @@
 #define _MOTION_PLAN_H_
 #include "RRTStruct.h"
 
-#define Threshold 0.85
+#define Threshold 0.75
 
 namespace MotionPlan
 {
@@ -168,7 +168,7 @@ namespace MotionPlan
     /// Transtion Test
     double Temperature = 100;
     double KConstant;
-    unsigned int maxStatesFailed = 3.0;
+    unsigned int maxStatesFailed = 10;
     double tempChangeFactor = 2.0;
     double minTemperature = 0.1;
     double initTemperature = 10e-6;

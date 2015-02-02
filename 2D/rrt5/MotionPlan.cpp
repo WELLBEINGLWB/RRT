@@ -303,7 +303,7 @@ void MotionPlan::RRT::Evaluation(int num){
     CostOld = CostCurrent;
   }
   // JailletのW(p)
-  W = Wc + 0.1*Wd;
+  W = Wc + stepSize * Wd;
 
   // コストの平均値
   AveCost = SumCost / DigitalPoint.size();

@@ -2,7 +2,7 @@
 #define _MOTION_PLAN_H_
 #include "RRTStruct.h"
 
-#define Threshold 0.75
+#define Threshold 0.40
 
 namespace MotionPlan
 {

@@ -254,6 +254,7 @@ void MotionPlan::RRT::CreatePotentialField()
   // KConstant = 10000*(f_xy(xStart, yStart) + f_xy(xGoal, yGoal))/2.0;
 }
 
+
 void MotionPlan::RRT::Evaluation(int num){
   double dx,dy;
   POINT newP;
@@ -266,7 +267,7 @@ void MotionPlan::RRT::Evaluation(int num){
   double d;
   double S_sum = 0.0, sigma;
 
-  for(unsigned int i = 0; i < paths.size()-1; i++ ){
+  for(unsigned int i = 0; i < paths.size()-1; i++){
     dx = paths[i+1].x - paths[i].x;
     dy = paths[i+1].y - paths[i].y;
 
@@ -296,7 +297,7 @@ void MotionPlan::RRT::Evaluation(int num){
       Wc += CostDiff * d;
       Wd += d;
     }
-    plot << DigitalPoint[i].x << "\t" << DigitalPoint[i].y << std::endl;
+    plot << DigitalPoint[i].x << "\t" << DigitalPoint[i].y << "\t" << CostCurrent << std::endl;
     CostOld = CostCurrent;
   }
   // JailletのW(p)

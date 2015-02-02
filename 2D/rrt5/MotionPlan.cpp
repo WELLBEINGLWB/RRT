@@ -210,7 +210,7 @@ void MotionPlan::RRT::Evaluation(int num){
       Wc += CostDiff * d;
       Wd += d;
     }
-    plot << DigitalPoint[i].x << "\t" << DigitalPoint[i].y << std::endl;
+    plot << DigitalPoint[i].x << "\t" << DigitalPoint[i].y << "\t" << CostCurrent << std::endl;
     CostOld = CostCurrent;
   }
   // JailletのW(p)
@@ -648,7 +648,7 @@ void MotionPlan::RRT::RRTloop(int* iterations, int* nodePath, int* pathLength, s
     }
   }
   #ifdef Evaluate
-  Evaluation(2);
+  Evaluation(1);
   #endif
   #ifdef Smooth
   smoothing(10000);

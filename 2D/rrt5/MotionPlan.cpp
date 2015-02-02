@@ -12,8 +12,8 @@ bool MotionPlan::RRT::clear(double xTest, double yTest){
 
 
 bool MotionPlan::RRT::link(double xStart, double yStart,
-  double xDest, double yDest,
-  double stepSize)
+                           double xDest, double yDest,
+                           double stepSize)
 {
   double dx = xDest - xStart;
   double dy = yDest - yStart;
@@ -25,22 +25,15 @@ bool MotionPlan::RRT::link(double xStart, double yStart,
   double Potential;
   double MaxPotential = 0.0;
 
-  // POINT MaxPoint;
-  // bool flag = true;
-
-  // std::ofstream outStream("./plot_data/PotentialData.dat");
-
   if (!clear(xStart, yStart) ||
       !clear(xDest, yDest)) {
-    //std::cout << "スタートとゴールが障害物内" << std::endl;
     return false;
-}
+  }
 
-for(double length = 0.0; length < dist; length += 0.5*stepSize){
-  CheckX = xStart + length * (dx / dist);
-  CheckY = yStart + length * (dy / dist);
-  Potential = f_xy(CheckX, CheckY);
-    // outStream << CheckX << "\t" << CheckY << "\t" << Potential << std::endl;
+  for(double length = 0.0; length < dist; length += 0.5*stepSize){
+    CheckX = xStart + length * (dx / dist);
+    CheckY = yStart + length * (dy / dist);
+    Potential = f_xy(CheckX, CheckY);
 
     if (Potential > MaxPotential) {  // 経路中でもっとも高いポテンシャルを計算（最大値計算）
       MaxPotential = Potential;
@@ -214,7 +207,7 @@ void MotionPlan::RRT::Evaluation(int num){
     CostOld = CostCurrent;
   }
   // JailletのW(p)
-  W = Wc + 0.1*Wd;
+  W = Wc + stepSize*Wd;
 
   // コストの平均値
   AveCost = SumCost / DigitalPoint.size();
@@ -405,6 +398,7 @@ bool MotionPlan::RRT::checkGoal(const TreeNode* checkNode)
   }
 }
 
+
 // #define ChecktransitionTest
 bool MotionPlan::RRT::transitionTest(const TreeNode* child, const TreeNode* parent)
 {
@@ -527,7 +521,6 @@ bool MotionPlan::RRT::minExpansionControl(double randMotionDistance)
 // the goal and building a path backwards through its parents. Reverse this
 // list, and you have the path.
 // If the goal was never added to the tree, return false.
-
 bool MotionPlan::RRT::findPath(int* iterations, int* nodePath, int* pathLength)
 {
 
@@ -770,115 +763,115 @@ void MotionPlan::RRT::smoothing(int loop)
   }
 
 
-  void MotionPlan::RRT::CreateCube(std::ostream &cube)
-  {
+void MotionPlan::RRT::CreateCube(std::ostream &cube)
+{
   #ifndef APF
-    RANGE obstacle;
+  RANGE obstacle;
   #endif
   // std::ofstream cube("./plot_data/testcase1_obstacle.dat");
-    std::ofstream plot("./plot_data/start_goal.dat");
-    std::ofstream pathinit("./plot_data/path_data.dat", std::ios_base::trunc);
-    std::ofstream smoothData("./plot_data/path_data_mod.dat", std::ios_base::trunc);
-    std::ofstream splineData("./plot_data/Bspline.dat", std::ios_base::trunc);
+  std::ofstream plot("./plot_data/start_goal.dat");
+  std::ofstream pathinit("./plot_data/path_data.dat", std::ios_base::trunc);
+  std::ofstream smoothData("./plot_data/path_data_mod.dat", std::ios_base::trunc);
+  std::ofstream splineData("./plot_data/Bspline.dat", std::ios_base::trunc);
 
   #ifdef APF
-    plot << xStart << "\t" << yStart << "\t" << f_xy(xStart, yStart) << std::endl;
-    plot << xGoal << "\t" << yGoal << "\t" << f_xy(xGoal, yGoal) << std::endl;
-    output_plt("./plot_data/APFplot.plt");
+  plot << xStart << "\t" << yStart << "\t" << f_xy(xStart, yStart) << std::endl;
+  plot << xGoal << "\t" << yGoal << "\t" << f_xy(xGoal, yGoal) << std::endl;
+  output_plt("./plot_data/APFplot.plt");
   #else
-    plot << xStart << "\t" << yStart << std::endl;
-    plot << xGoal << "\t" << yGoal << std::endl;
+  plot << xStart << "\t" << yStart << std::endl;
+  plot << xGoal << "\t" << yGoal << std::endl;
 
-    for(int ob = 0; ob < numObstacles; ++ob){
-      obstacle.xrange[0] = xMin[ob]; obstacle.yrange[0] = yMin[ob];
-      obstacle.xrange[1] = xMax[ob]; obstacle.yrange[1] = yMax[ob];
-      for (int i = 0; i < 2; ++i){
-        cube << obstacle.xrange[0] << "\t" << obstacle.yrange[0] << "\t" << std::endl;
-        cube << obstacle.xrange[1] << "\t" << obstacle.yrange[0] << "\t" << std::endl;
-        cube << obstacle.xrange[1] << "\t" << obstacle.yrange[1] << "\t" << std::endl;
-        cube << obstacle.xrange[0] << "\t" << obstacle.yrange[1] << "\t" << std::endl;
-        cube << obstacle.xrange[0] << "\t" << obstacle.yrange[0] << "\t" << std::endl;
-        cube << "\n\n";
-      }
+  for(int ob = 0; ob < numObstacles; ++ob){
+    obstacle.xrange[0] = xMin[ob]; obstacle.yrange[0] = yMin[ob];
+    obstacle.xrange[1] = xMax[ob]; obstacle.yrange[1] = yMax[ob];
+    for (int i = 0; i < 2; ++i){
+      cube << obstacle.xrange[0] << "\t" << obstacle.yrange[0] << "\t" << std::endl;
+      cube << obstacle.xrange[1] << "\t" << obstacle.yrange[0] << "\t" << std::endl;
+      cube << obstacle.xrange[1] << "\t" << obstacle.yrange[1] << "\t" << std::endl;
+      cube << obstacle.xrange[0] << "\t" << obstacle.yrange[1] << "\t" << std::endl;
+      cube << obstacle.xrange[0] << "\t" << obstacle.yrange[0] << "\t" << std::endl;
+      cube << "\n\n";
     }
+  }
   #endif
 
   #ifdef PlotAnimation
-    pathinit << xStart << "\t" << yStart << std::endl;
-    pathinit << xStart << "\t" << yStart << std::endl;
+  pathinit << xStart << "\t" << yStart << std::endl;
+  pathinit << xStart << "\t" << yStart << std::endl;
 
-    smoothData << xStart << "\t" << yStart << std::endl;
-    smoothData << xStart << "\t" << yStart << std::endl;
+  smoothData << xStart << "\t" << yStart << std::endl;
+  smoothData << xStart << "\t" << yStart << std::endl;
 
-    splineData << xStart << "\t" << yStart << std::endl;
-    splineData << xStart << "\t" << yStart << std::endl;
+  splineData << xStart << "\t" << yStart << std::endl;
+  splineData << xStart << "\t" << yStart << std::endl;
   #endif
 
-  }
+}
 
 
-  void MotionPlan::RRT::outputTree(std::ostream &outStream)
-  {
+void MotionPlan::RRT::outputTree(std::ostream &outStream)
+{
   #ifdef APF
-    POINT tmp[2];
+  POINT tmp[2];
   #endif
 
   //ノードの座標を2点ずつのブロックでファイルに書き込み
-    for (unsigned int i = 0; i < edges.size(); ++i){
+  for (unsigned int i = 0; i < edges.size(); ++i){
     #ifdef APF
-      tmp[0].x = (nodes[edges[i].node1])->x;
-      tmp[0].y = (nodes[edges[i].node1])->y;
-      tmp[1].x = (nodes[edges[i].node2])->x;
-      tmp[1].y = (nodes[edges[i].node2])->y;
-      outStream << tmp[0].x << "\t" << tmp[0].y << "\t" << f_xy(tmp[0].x, tmp[0].y) << std::endl;
-      outStream << tmp[1].x << "\t" << tmp[1].y << "\t" << f_xy(tmp[1].x, tmp[1].y) << std::endl;
+    tmp[0].x = (nodes[edges[i].node1])->x;
+    tmp[0].y = (nodes[edges[i].node1])->y;
+    tmp[1].x = (nodes[edges[i].node2])->x;
+    tmp[1].y = (nodes[edges[i].node2])->y;
+    outStream << tmp[0].x << "\t" << tmp[0].y << "\t" << f_xy(tmp[0].x, tmp[0].y) << std::endl;
+    outStream << tmp[1].x << "\t" << tmp[1].y << "\t" << f_xy(tmp[1].x, tmp[1].y) << std::endl;
     #else
-      outStream << (nodes[edges[i].node1])->x << "\t" << (nodes[edges[i].node1])->y << std::endl;
-      outStream << (nodes[edges[i].node2])->x << "\t" << (nodes[edges[i].node2])->y << std::endl;
+    outStream << (nodes[edges[i].node1])->x << "\t" << (nodes[edges[i].node1])->y << std::endl;
+    outStream << (nodes[edges[i].node2])->x << "\t" << (nodes[edges[i].node2])->y << std::endl;
     #endif
 
-      outStream << "\n" << std::endl;
+    outStream << "\n" << std::endl;
 
     #ifdef PlotAnimation
-      for (int k = 0; k < 100; ++k){
-        usleep(100);
-      }
+    for (int k = 0; k < 100; ++k){
+      usleep(100);
+    }
     #endif
 
-    }
   }
+}
 
 
-  void MotionPlan::RRT::output_plt(string plt_output){
-    std::ofstream plt(plt_output);
+void MotionPlan::RRT::output_plt(string plt_output){
+  std::ofstream plt(plt_output);
 
-    plt << "set xlabel \"x\""<< endl;
-    plt << "set ylabel \"y\"" << endl;
-    plt << "set zlabel \"z\"" << endl;
-    plt << "set xrange [" << xLeft << ":" << xRight << "]" << endl;
-    plt << "set yrange [" << yBottom << ":" << yTop << "]" << endl;
-    plt << "set zrange [" << 0 << ":" << 2.5*K << "]" << endl;
-  //plt << "set zrange [" << 0 << ":" << MAX_FIELD+1 << "]" << endl;
-    plt << "set ticslevel 0\n" << endl;
+  plt << "set xlabel \"x\""<< endl;
+  plt << "set ylabel \"y\"" << endl;
+  plt << "set zlabel \"z\"" << endl;
+  plt << "set xrange [" << xLeft << ":" << xRight << "]" << endl;
+  plt << "set yrange [" << yBottom << ":" << yTop << "]" << endl;
+  plt << "set zrange [" << 0 << ":" << 2.5*K << "]" << endl;
+  // plt << "set zrange [" << 0 << ":" << MAX_FIELD+1 << "]" << endl;
+  plt << "set ticslevel 0\n" << endl;
 
-    plt << "splot ";
-    for (size_t i = 0, size = vobstacle.size(); i < size; ++i){
-      plt << " + " << K << " * exp(-" << r_1 << " * (x-" << vobstacle[i].x << ")**2 - " << r_2 << " * (y-" << vobstacle[i].y << ")**2)";
-    }
-    plt << " + " << K_1 << " * ((x-" << xGoal << ")**2" << " + (y-" << yGoal << ")**2)";
-
-    plt << " title \"Potential Field\" with pm3d,\\" << endl;
-
-    plt << "\"start_goal.dat\" using 1:2:3 with points pt 7 ps 2 lt rgb \"#ff9900\" title \"Start & Goal\",\\" << endl;
-    plt << "\"data.dat\" using 1:2:3 with lines lt rgb \"#696969\" lw 1 title \"node\",\\" << endl;
-    plt << "\"path_data.dat\" using 1:2:3 with lines lt rgb \"#ff4500\" lw 3 title \"Before\",\\" << endl;
-    plt << "\"path_data_mod.dat\" using 1:2:3 with lines lt rgb \"#66cdaa\" lw 3 title \"After\"" << endl;
+  plt << "splot ";
+  for (size_t i = 0, size = vobstacle.size(); i < size; ++i){
+    plt << " + " << K << " * exp(-" << r_1 << " * (x-" << vobstacle[i].x << ")**2 - " << r_2 << " * (y-" << vobstacle[i].y << ")**2)";
   }
+  plt << " + " << K_1 << " * ((x-" << xGoal << ")**2" << " + (y-" << yGoal << ")**2)";
+
+  plt << " title \"Potential Field\" with pm3d,\\" << endl;
+
+  plt << "\"start_goal.dat\" using 1:2:3 with points pt 7 ps 2 lt rgb \"#ff9900\" title \"Start & Goal\",\\" << endl;
+  plt << "\"data.dat\" using 1:2:3 with lines lt rgb \"#696969\" lw 1 title \"node\",\\" << endl;
+  plt << "\"path_data.dat\" using 1:2:3 with lines lt rgb \"#ff4500\" lw 3 title \"Before\",\\" << endl;
+  plt << "\"path_data_mod.dat\" using 1:2:3 with lines lt rgb \"#66cdaa\" lw 3 title \"After\"" << endl;
+}
 
 
-  void MotionPlan::RRT::OutputFinalPath(std::vector<POINT> *finalpath)
-  {
+void MotionPlan::RRT::OutputFinalPath(std::vector<POINT> *finalpath)
+{
   //std::cout << "copy" << std::endl;
-    finalpath->resize(paths.size());
-    copy(paths.begin(), paths.end(), finalpath->begin());
-  }
+  finalpath->resize(paths.size());
+  copy(paths.begin(), paths.end(), finalpath->begin());
+}

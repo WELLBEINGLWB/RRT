@@ -122,10 +122,10 @@ void MotionPlan::RRT::TreeNode::deleteChildren()
 
 
 MotionPlan::RRT::RRT(double* xMini, double* xMaxi, double* yMini, double* yMaxi, int numObs,
- double xL, double xR, double yT, double yB,
- double xS, double yS,
- double xG, double yG,
- double step) :
+                     double xL, double xR, double yT, double yB,
+                     double xS, double yS,
+                     double xG, double yG,
+                     double step) :
 root(NULL),
 xMin(xMini), xMax(xMaxi), yMin(yMini), yMax(yMaxi),
 numObstacles(numObs),

@@ -175,7 +175,7 @@ void MotionPlan::RRT::CreatePotentialField()
     }
   }
   // T-RRT用の定数を計算
-  KConstant = 1000*(f_xy(xStart, yStart, zStart) + f_xy(xGoal, yGoal, zGoal))/2.0;
+  KConstant = 100*(f_xy(xStart, yStart, zStart) + f_xy(xGoal, yGoal, zGoal))/2.0;
 }
 
 

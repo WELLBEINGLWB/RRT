@@ -23,15 +23,12 @@
 #define Evaluate
 // #define Smooth
 
-// #define K 60      // 障害物のポテンシャルの高さ
-// #define r_1 2     // ポテンシャルのx軸方向の大きさ
-// #define r_2 2     // ポテンシャルのy軸方向の大きさ
-#define K 100      // 障害物のポテンシャルの高さ
-#define K_1 1      // 引力のポテンシャルの高さ
+#define K 100        // 障害物のポテンシャルの高さ
+// #define K 60        // （以前の）障害物のポテンシャルの高さ
+#define K_1 1       // goalに導く引力ポテンシャルの高さ
 #define r_1 2     // ポテンシャルのx軸方向の大きさ
 #define r_2 2     // ポテンシャルのy軸方向の大きさ
 #define r_3 2     // ポテンシャルのz軸方向の大きさ
-
 
 using namespace std;
 

@@ -2,7 +2,7 @@
 #define _MOTION_PLAN_H_
 #include "RRTStruct.h"
 
-#define Threshold 20
+#define Threshold 60
 
 namespace MotionPlan
 {
@@ -10,6 +10,7 @@ namespace MotionPlan
   class RRT
   {
   public:
+
     /// Checks whether a point (xTest,yTest) is in collision
     /// with any of the obstacles defined by their min/max coordinates.
     bool clear(double xTest, double yTest, double zTest);
@@ -66,7 +67,6 @@ namespace MotionPlan
     /// Initializes the RRT as above, except uses data from a file to do so.
     RRT(std::string fileName);
 
-    /// ポテンシャル場の定義
     void CreatePotentialField();
 
     /// ポテンシャルの評価用関数

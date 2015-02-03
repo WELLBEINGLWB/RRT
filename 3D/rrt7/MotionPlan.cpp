@@ -165,9 +165,9 @@ void MotionPlan::RRT::CreatePotentialField()
 
   std::cout << "ポテンシャル場の作成" << std::endl;
   for (int i = 0; i < numObstacles; ++i) {
-    for (double x = xMin[i]; x <= xMax[i]; x+=0.1) {
-      for(double y = yMin[i]; y <= yMax[i]; y+=0.1){
-        for(double z = zMin[i]; z <= zMax[i]; z+=0.1){
+    for (double x = xMin[i]; x <= xMax[i]; x+=1) {
+      for(double y = yMin[i]; y <= yMax[i]; y+=1){
+        for(double z = zMin[i]; z <= zMax[i]; z+=1){
           tmp.x = x; tmp.y = y; tmp.z = z;
           vobstacle.push_back(tmp);
         }
@@ -175,7 +175,7 @@ void MotionPlan::RRT::CreatePotentialField()
     }
   }
   // T-RRT用の定数を計算
-  KConstant = 10000*(f_xy(xStart, yStart, zStart) + f_xy(xGoal, yGoal, zGoal))/2.0;
+  KConstant = 1000*(f_xy(xStart, yStart, zStart) + f_xy(xGoal, yGoal, zGoal))/2.0;
 }
 
 
@@ -259,6 +259,7 @@ void MotionPlan::RRT::Evaluation(int num){
   cout << "S = " << sigma << endl;
   cout << "Num of Point = " << paths.size() << endl;
 }
+
 
 
 // Reads initialization info for this RRT from a file with the
@@ -448,6 +449,7 @@ bool MotionPlan::RRT::checkGoal(const TreeNode* checkNode)
 
 
 
+// #define ChecktransitionTest
 bool MotionPlan::RRT::transitionTest(const TreeNode* child, const TreeNode* parent)
 {
   double distance;
@@ -463,7 +465,7 @@ bool MotionPlan::RRT::transitionTest(const TreeNode* child, const TreeNode* pare
   distance = stepSize;
   // 親ノードと子ノードのコスト計算
   childCost = f_xy(child->x, child->y, child->z);
-  parentCost = f_xy(parent->x, parent->y, child->z);
+  parentCost = f_xy(parent->x, parent->y, parent->z);
   #ifdef ChecktransitionTest
   cout << "childCost = " << childCost << ", parentCost = " << parentCost << endl;
   #endif
@@ -530,7 +532,6 @@ bool MotionPlan::RRT::transitionTest(const TreeNode* child, const TreeNode* pare
 
   return result;
 }
-
 
 
 bool MotionPlan::RRT::minExpansionControl(double randMotionDistance)
@@ -614,8 +615,7 @@ bool MotionPlan::RRT::findPath(int* iterations, int* nodePath, int* pathLength)
     near = nearestNode(sampleX, sampleY, sampleZ);
     newNode = genNewNode(near, sampleX, sampleY, sampleZ);
 
-    // if (newNode != NULL && transitionTest(near, newNode)){
-    if (newNode != NULL){
+    if (newNode != NULL && transitionTest(near, newNode)){
       newNode->parent = near;
       near->children.push_back(newNode);
 
@@ -673,6 +673,7 @@ bool MotionPlan::RRT::findPath(int* iterations, int* nodePath, int* pathLength)
 
 void MotionPlan::RRT::RRTloop(int* iterations, int* nodePath, int* pathLength, std::ostream& nodeData)
 {
+  std::string a;
   POINT tmp;
 
   while(1){

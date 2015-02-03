@@ -67,7 +67,7 @@ double MotionPlan::RRT::f_xy(double x,double y, double z)
   for (size_t i = 0, size = vobstacle.size(); i < size; ++i){
     sum += K*exp(-r_1*pow(x-vobstacle[i].x, 2) - r_2*pow(y-vobstacle[i].y, 2) - r_3*pow(z-vobstacle[i].z, 2));
   }
-  return sum + K_1*(pow(x-xGoal, 2) + pow(y-yGoal, 2));
+  return sum + K_1*(pow(x-xGoal, 2) + pow(y-yGoal, 2) + pow(z-zGoal, 2));
 }
 
 
@@ -165,9 +165,9 @@ void MotionPlan::RRT::CreatePotentialField()
 
   std::cout << "ポテンシャル場の作成" << std::endl;
   for (int i = 0; i < numObstacles; ++i) {
-    for (double x = xMin[i]; x <= xMax[i]; x+=1) {
-      for(double y = yMin[i]; y <= yMax[i]; y+=1){
-        for(double z = zMin[i]; z <= zMax[i]; z+=1){
+    for (double x = xMin[i]; x <= xMax[i]; x+=0.1) {
+      for(double y = yMin[i]; y <= yMax[i]; y+=0.1){
+        for(double z = zMin[i]; z <= zMax[i]; z+=0.1){
           tmp.x = x; tmp.y = y; tmp.z = z;
           vobstacle.push_back(tmp);
         }
@@ -614,7 +614,8 @@ bool MotionPlan::RRT::findPath(int* iterations, int* nodePath, int* pathLength)
     near = nearestNode(sampleX, sampleY, sampleZ);
     newNode = genNewNode(near, sampleX, sampleY, sampleZ);
 
-    if (newNode != NULL && transitionTest(near, newNode)){
+    // if (newNode != NULL && transitionTest(near, newNode)){
+    if (newNode != NULL){
       newNode->parent = near;
       near->children.push_back(newNode);
 

@@ -6,23 +6,22 @@
 
 namespace MotionPlan
 {
-  /// Checks whether a point (xTest,yTest) is in collision
-  /// with any of the obstacles defined by their min/max coordinates.
-  bool clear(double xTest, double yTest, double zTest, std::vector<POINT> &vobstacle);
-
-  /// A geometrically exact query for whether the line between
-  /// points (xStart,yStart) and (xDest,yDest) collides with any
-  /// of the obstacles defined by their mein/max coordinates
-  bool link(double xStart, double yStart, double zStart,
-            double xDest, double yDest, double zDest,
-            std::vector<POINT> &vobstacle, double stepSize);
-
-  double f_xy(double x,double y, double z, std::vector<POINT> &vobstacle);
-
 
   class RRT
   {
   public:
+    /// Checks whether a point (xTest,yTest) is in collision
+    /// with any of the obstacles defined by their min/max coordinates.
+    bool clear(double xTest, double yTest, double zTest);
+
+    /// A geometrically exact query for whether the line between
+    /// points (xStart,yStart) and (xDest,yDest) collides with any
+    /// of the obstacles defined by their mein/max coordinates
+    bool link(double xStart, double yStart, double zStart,
+              double xDest, double yDest, double zDest,
+              double stepSize);
+
+    double f_xy(double x,double y, double z);
 
     /// Represents a node in an RRT
     /// Stores its own positional information, as well as
@@ -67,7 +66,12 @@ namespace MotionPlan
     /// Initializes the RRT as above, except uses data from a file to do so.
     RRT(std::string fileName);
 
+    /// ポテンシャル場の定義
     void CreatePotentialField();
+
+    /// ポテンシャルの評価用関数
+    void Evaluation(int num);
+    char savefilename[64] = {'\0'};
 
     /// Destructor
     ~RRT();
@@ -103,6 +107,9 @@ namespace MotionPlan
     /// function returns NULL. If the new node is valid, a pointer to it is
     /// returned.
     TreeNode* genNewNode(const TreeNode* nearest, double x, double y, double z);
+
+    bool transitionTest(const TreeNode* child, const TreeNode* parent);
+    bool minExpansionControl(double randMotionDistance);
 
     /// Checks whether the goal position is within stepSize distance and
     /// reachable from checkNode. If so, return true. If it's too far away
@@ -165,6 +172,21 @@ namespace MotionPlan
 
     /// ポテンシャル場を形成するための障害物点を定義するようベクター
     std::vector<POINT> vobstacle;
+
+    /// Transtion Test
+    double Temperature = 100;
+    double KConstant;
+    unsigned int maxStatesFailed = 10;
+    double tempChangeFactor = 2.0;
+    double minTemperature = 0.1;
+    double initTemperature = 10e-6;
+    unsigned int numStatesFailed;
+
+     /// Minimum Expansion Control
+    double nonfrontierCount = 1;
+    double frontierCount = 1;
+    double frontierThreshold = 0.0;
+    double frontierNodeRatio = 0.1;
 
     /// Maximum number of iterations to run when finding a path
     /// before givin up.

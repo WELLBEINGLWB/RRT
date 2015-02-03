@@ -2,8 +2,8 @@
 
 /// Simple iterates over each object in the space
 /// and checks whether the test point lies inside the obstacle.
-bool MotionPlan::clear(double xTest, double yTest, double zTest, std::vector<POINT> &vobstacle){
-  if(f_xy(xTest, yTest, zTest, vobstacle) > Threshold){
+bool MotionPlan::RRT::clear(double xTest, double yTest, double zTest){
+  if(f_xy(xTest, yTest, zTest) > Threshold){
     return false;
   }else{
     return true;
@@ -12,9 +12,9 @@ bool MotionPlan::clear(double xTest, double yTest, double zTest, std::vector<POI
 
 
 
-bool MotionPlan::link(double xStart, double yStart, double zStart,
+bool MotionPlan::RRT::link(double xStart, double yStart, double zStart,
                       double xDest, double yDest, double zDest,
-                      std::vector<POINT> &vobstacle, double stepSize)
+                      double stepSize)
 {
   double dx = xDest - xStart;
   double dy = yDest - yStart;
@@ -31,8 +31,8 @@ bool MotionPlan::link(double xStart, double yStart, double zStart,
   // bool flag = true;
   std::ofstream outStream("./plot_data/PotentialData.dat");
 
-  if (!clear(xStart, yStart, zStart, vobstacle) ||
-      !clear(xDest, yDest, zDest, vobstacle)) {
+  if (!clear(xStart, yStart, zStart) ||
+      !clear(xDest, yDest, zDest)) {
     //std::cout << "スタートとゴールが障害物内" << std::endl;
     return false;
   }
@@ -41,7 +41,7 @@ bool MotionPlan::link(double xStart, double yStart, double zStart,
     CheckX = xStart + length * (dx / dist);
     CheckY = yStart + length * (dy / dist);
     CheckZ = zStart + length * (dz / dist);
-    Potential = f_xy(CheckX, CheckY, CheckZ, vobstacle);
+    Potential = f_xy(CheckX, CheckY, CheckZ);
     //outStream << CheckX << "\t" << CheckY << "\t" << Potential << std::endl;
 
     if (Potential > MaxPotential) {  // 経路中でもっとも高いポテンシャルを計算（最大値計算）
@@ -60,14 +60,14 @@ bool MotionPlan::link(double xStart, double yStart, double zStart,
 
 
 // f(x,y)
-double MotionPlan::f_xy(double x,double y, double z, std::vector<POINT> &vobstacle)
+double MotionPlan::RRT::f_xy(double x,double y, double z)
 {
   double sum = 0.0;
 
   for (size_t i = 0, size = vobstacle.size(); i < size; ++i){
     sum += K*exp(-r_1*pow(x-vobstacle[i].x, 2) - r_2*pow(y-vobstacle[i].y, 2) - r_3*pow(z-vobstacle[i].z, 2));
   }
-  return sum;
+  return sum + K_1*(pow(x-xGoal, 2) + pow(y-yGoal, 2));
 }
 
 
@@ -174,8 +174,91 @@ void MotionPlan::RRT::CreatePotentialField()
       }
     }
   }
+  // T-RRT用の定数を計算
+  KConstant = 10000*(f_xy(xStart, yStart, zStart) + f_xy(xGoal, yGoal, zGoal))/2.0;
 }
 
+
+
+void MotionPlan::RRT::Evaluation(int num){
+  double dx,dy;
+  POINT newP;
+  std::vector<POINT> DigitalPoint;
+  double MaxCost = 0.0;
+  double AveCost = 0.0;
+  double SumCost = 0.0;
+  double CostCurrent, CostOld, CostDiff;
+  double W, Wc = 0.0, Wd = 0.0;
+  double d;
+  double S_sum = 0.0, sigma;
+
+  for(unsigned int i = 0; i < paths.size()-1; i++ ){
+    dx = paths[i+1].x - paths[i].x;
+    dy = paths[i+1].y - paths[i].y;
+    for (int j = 0; j < num; ++j){
+      newP.x = paths[i].x + j * (dx / num);
+      newP.y = paths[i].y + j * (dy / num);
+      DigitalPoint.push_back(newP);
+    }
+  }
+  newP.x = paths[paths.size()-1].x;
+  newP.y = paths[paths.size()-1].y;
+  DigitalPoint.push_back(newP);
+
+  std::ofstream plot("./plot_data/digitaldata.dat");
+  for (unsigned int i = 0; i < DigitalPoint.size(); i++ ){
+    CostCurrent = f_xy(DigitalPoint[i].x, DigitalPoint[i].y, DigitalPoint[i].z);
+    // コストの合計
+    SumCost += CostCurrent;
+    // コストの最大値計算
+    if(CostCurrent > MaxCost){
+      MaxCost = CostCurrent;
+    }
+    // JailletのW(p)
+    if(i > 0){
+      CostDiff = CostCurrent - CostOld;
+      if(CostDiff <= 0){
+        CostDiff = 0;
+      }
+      d = sqrt(pow(DigitalPoint[i].x-DigitalPoint[i-1].x, 2) + pow(DigitalPoint[i].y-DigitalPoint[i-1].y, 2));
+      Wc += CostDiff * d;
+      Wd += d;
+    }
+    plot << DigitalPoint[i].x << "\t" << DigitalPoint[i].y << "\t" << CostCurrent << std::endl;
+    CostOld = CostCurrent;
+  }
+  // JailletのW(p)
+  W = Wc + 0.001 * stepSize * Wd;
+
+  // コストの平均値
+  AveCost = SumCost / DigitalPoint.size();
+
+  // コストの標準偏差
+  for (unsigned int i = 0; i < DigitalPoint.size(); i++ ){
+    S_sum += pow((f_xy(DigitalPoint[i].x, DigitalPoint[i].y, DigitalPoint[i].z) - AveCost),2);
+  }
+  sigma = sqrt(S_sum/DigitalPoint.size());
+
+  // 評価データを保存
+  time_t t = time(NULL);
+  strftime(savefilename, sizeof(savefilename), "./evaluation_data/T-RRT/Evaluate_20%y.%m.%d_%H:%M:%S.dat", localtime(&t));
+  std::ofstream data(savefilename);
+  data << "Length = " << Wd << endl;
+  data << "MaxCost = " << MaxCost << endl;
+  data << "AveCost = " << AveCost << endl;
+  data << "SumCost = " << SumCost << endl;
+  data << "W(p) = " << W << endl;
+  data << "S = " << sigma << endl;
+  data << "Num of Point = " << paths.size() << endl;
+
+  cout << "Length = " << Wd << endl;
+  cout << "MaxCost = " << MaxCost << endl;
+  cout << "AveCost = " << AveCost << endl;
+  cout << "SumCost = " << SumCost << endl;
+  cout << "W(p) = " << W << endl;
+  cout << "S = " << sigma << endl;
+  cout << "Num of Point = " << paths.size() << endl;
+}
 
 
 // Reads initialization info for this RRT from a file with the
@@ -297,7 +380,7 @@ void MotionPlan::RRT::randFreeSample(double* x, double* y, double* z)
       (*x) = (((double)rand())/RAND_MAX)*(xRight - xLeft) + xLeft;
       (*y) = (((double)rand())/RAND_MAX)*(yTop - yBottom) + yBottom;
       (*z) = (((double)rand())/RAND_MAX)*(zTop - zBottom) + zBottom;
-    } while(!clear(*x, *y, *z, paths));
+    } while(!clear(*x, *y, *z));
   }
 }
 
@@ -331,7 +414,7 @@ MotionPlan::RRT::TreeNode* MotionPlan::RRT::genNewNode(const TreeNode* nearest, 
   double newY = nearest->y + stepSize * (dy / dist);
   double newZ = nearest->z + stepSize * (dz / dist);
 
-  if (link(nearest->x, nearest->y, nearest->z, newX, newY, newZ, vobstacle, stepSize)){
+  if (link(nearest->x, nearest->y, nearest->z, newX, newY, newZ, stepSize)){
 
     TreeNode* newNode = new TreeNode;
     newNode->x = newX;
@@ -357,9 +440,118 @@ bool MotionPlan::RRT::checkGoal(const TreeNode* checkNode)
   double dz = zGoal - checkNode->z;
 
   if ((dx*dx + dy*dy + dz*dz) <= stepSize*stepSize){
-    return link(checkNode->x, checkNode->y, checkNode->z, xGoal, yGoal, zGoal, vobstacle, stepSize);
+    return link(checkNode->x, checkNode->y, checkNode->z, xGoal, yGoal, zGoal, stepSize);
   } else{
     return false;
+  }
+}
+
+
+
+bool MotionPlan::RRT::transitionTest(const TreeNode* child, const TreeNode* parent)
+{
+  double distance;
+  double childCost, parentCost;
+
+  // KConstantはスタートとゴールのポテンシャルによってきまる
+  #ifdef ChecktransitionTest
+  cout << "KConstant = " << KConstant << endl;
+
+  cout << "Temperature = " << Temperature << endl;
+  #endif
+
+  distance = stepSize;
+  // 親ノードと子ノードのコスト計算
+  childCost = f_xy(child->x, child->y, child->z);
+  parentCost = f_xy(parent->x, parent->y, child->z);
+  #ifdef ChecktransitionTest
+  cout << "childCost = " << childCost << ", parentCost = " << parentCost << endl;
+  #endif
+
+  // もし，親ノードより子ノードがコストが低かったら
+  if (childCost <= parentCost){
+    #ifdef ChecktransitionTest
+    cout << "transitionProbabilityは計算しなくていい" << endl;
+    #endif
+    return true;
+  }
+
+  // コストの差と距離を計算
+  double costSlope = (childCost - parentCost) / distance;
+  #ifdef ChecktransitionTest
+  cout << "costSlope = " << costSlope << endl;
+  #endif
+  double transitionProbability = 1.0; // if cost_slope is <= 0, probabilty is 1
+
+  // falseで初期化
+  bool result = false;
+
+  // 確率計算
+  if (costSlope > 0){
+    transitionProbability = exp(-costSlope / (KConstant * Temperature));
+    #ifdef ChecktransitionTest
+    cout << "transitionProbability = " << transitionProbability << endl;
+    #endif
+  }
+
+  // Check if we can accept it
+  double rand01;
+  rand01 = ((double)rand())/RAND_MAX;
+  #ifdef ChecktransitionTest
+  cout << "rand01 = " << rand01 << endl;
+  #endif
+  if (rand01 <= transitionProbability){
+    if (Temperature > minTemperature){
+      #ifdef ChecktransitionTest
+      cout << "温度下げた！" << endl;
+      #endif
+      Temperature /= tempChangeFactor;
+      // Temperatureが小さ過ぎたら
+      if (Temperature <= minTemperature) {
+        Temperature = minTemperature;
+      }
+    }
+
+    numStatesFailed = 0;
+
+    result = true;
+  } else {
+    // State has failed
+    if (numStatesFailed >= maxStatesFailed) {
+      #ifdef ChecktransitionTest
+      cout << "温度上げた！" << endl;
+      #endif
+      Temperature *= tempChangeFactor;
+      numStatesFailed = 0;
+    } else {
+      ++numStatesFailed;
+    }
+  }
+
+  return result;
+}
+
+
+
+bool MotionPlan::RRT::minExpansionControl(double randMotionDistance)
+{
+  // Decide to accept or not
+  if (randMotionDistance > frontierThreshold) {
+    // participates in the tree expansion
+    ++frontierCount;
+    return true;
+  } else {
+    // participates in the tree refinement
+    // check our ratio first before accepting it
+    if ((double)nonfrontierCount / (double)frontierCount > frontierNodeRatio){
+      // Increment so that the temperature rises faster
+      ++numStatesFailed;
+      // reject this node as being too much refinement
+      return false;
+    }else{
+      ++nonfrontierCount;
+      return true;
+    }
   }
 }
 
@@ -422,7 +614,7 @@ bool MotionPlan::RRT::findPath(int* iterations, int* nodePath, int* pathLength)
     near = nearestNode(sampleX, sampleY, sampleZ);
     newNode = genNewNode(near, sampleX, sampleY, sampleZ);
 
-    if (newNode != NULL){
+    if (newNode != NULL && transitionTest(near, newNode)){
       newNode->parent = near;
       near->children.push_back(newNode);
 
@@ -503,8 +695,12 @@ void MotionPlan::RRT::RRTloop(int* iterations, int* nodePath, int* pathLength, s
       std::cout << "Path not found." << std::endl;
     }
   }
+  #ifdef Evaluate
+  Evaluation(1);
+  #endif
+  #ifdef Smooth
   smoothing(10000);
-
+  #endif
 }
 
 
@@ -576,7 +772,7 @@ void MotionPlan::RRT::smoothing(int loop)
     // 2点を結んだ直線の干渉チェック
     if (link(paths[SamplePoint[0]].x, paths[SamplePoint[0]].y, paths[SamplePoint[0]].z,
              paths[SamplePoint[1]].x, paths[SamplePoint[1]].y, paths[SamplePoint[1]].z,
-             vobstacle, stepSize)){
+             stepSize)){
       //std::cout << SamplePoint[0] << "と" << SamplePoint[1] << "の間の点はグッバイ！" << std::endl;
       //std::cout << i+1 << "ループ目、グッバイしたあとのpathの長さは" << paths.size() << "です。" << std::endl;
       paths.erase(paths.begin()+SamplePoint[0]+1, paths.begin()+SamplePoint[1]);
@@ -718,7 +914,7 @@ void MotionPlan::RRT::outputPotential(std::ostream &outStream)
     for (double x = xMin[i]-1; x <= xMax[i]+1; x+=0.05) {
       for(double y = yMin[i]-1; y <= yMax[i]+1; y+=0.05){
         for(double z = zMin[i]; z <= zMax[i]+1; z+=0.1){
-          outStream << x << "\t" << y << "\t" << z << "\t" << MotionPlan::f_xy(x, y, z, vobstacle) << endl;
+          outStream << x << "\t" << y << "\t" << z << "\t" << f_xy(x, y, z) << endl;
         }
       }
     }

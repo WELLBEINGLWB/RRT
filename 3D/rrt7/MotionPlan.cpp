@@ -1,7 +1,7 @@
 #include "MotionPlan.h"
 
 // (xTest, yTest)が障害物の中にあるかどうかの判定
-bool MotionPlan::clear(const double* xMin, const double* xMax,
+bool MotionPlan::RRT::clear(const double* xMin, const double* xMax,
                        const double* yMin, const double* yMax,
                        const double* zMin, const double* zMax,
                        int numObstacles,
@@ -20,7 +20,7 @@ bool MotionPlan::clear(const double* xMin, const double* xMax,
 
 
 
-void MotionPlan::CreateGridPoint(const double* xMin, const double* xMax,
+void MotionPlan::RRT::CreateGridPoint(const double* xMin, const double* xMax,
                                  const double* yMin, const double* yMax,
                                  const double* zMin, const double* zMax, POINT *P, int i)
 {
@@ -36,7 +36,7 @@ void MotionPlan::CreateGridPoint(const double* xMin, const double* xMax,
 
 
 
-void MotionPlan::PlaneEquation(POINT p[], int i0[], int i1[], int i2[], int i, double a[])
+void MotionPlan::RRT::PlaneEquation(POINT p[], int i0[], int i1[], int i2[], int i, double a[])
 {
   // 平面の方程式の係数を導出 (ax+by+cz=d)
   // http://keisan.casio.jp/has10/SpecExec.cgi
@@ -50,7 +50,7 @@ void MotionPlan::PlaneEquation(POINT p[], int i0[], int i1[], int i2[], int i, d
 
 
 
-void MotionPlan::Pcompare(POINT A, POINT B, POINT *compare)
+void MotionPlan::RRT::Pcompare(POINT A, POINT B, POINT *compare)
 {
   // 与えられた2点のどちらが小さいか、配列compareに小さい順に格納
   if ((A.x - B.x) > 0) {
@@ -80,7 +80,7 @@ void MotionPlan::Pcompare(POINT A, POINT B, POINT *compare)
 
 
 
-bool MotionPlan::link(const double* xMin, const double* xMax,
+bool MotionPlan::RRT::link(const double* xMin, const double* xMax,
                       const double* yMin, const double* yMax,
                       const double* zMin, const double* zMax,
                       int numObstacles,
@@ -232,9 +232,125 @@ MotionPlan::RRT::RRT(std::string fileName):
   initFromFile(fileName);
   std::ofstream file("./plot_data/testcase1_obstacle.dat");
   CreateCube(file);
+  #ifdef Evaluate
+  CreatePotentialField();
+  #endif
   srand((unsigned int)time(NULL));
 }
 
+
+
+void MotionPlan::RRT::CreatePotentialField()
+{
+  POINT tmp;
+  std::cout << "ポテンシャル場の作成" << std::endl;
+  for (int i = 0; i < numObstacles; ++i) {
+    for (double x = xMin[i]; x <= xMax[i]; ++x) {
+      for(double y = yMin[i]; y <= yMax[i]; ++y){
+        tmp.x = x; tmp.y = y;
+        vobstacle.push_back(tmp);
+      }
+    }
+  }
+  // T-RRT用の定数を計算
+  // KConstant = 10000*(f_xy(xStart, yStart) + f_xy(xGoal, yGoal))/2.0;
+}
+
+
+// f(x,y)
+double MotionPlan::RRT::f_xy(double x, double y, double z)
+{
+  double sum = 0.0;
+
+  for (size_t i = 0, size = vobstacle.size(); i < size; ++i){
+    sum += K*exp(-r_1*pow(x-vobstacle[i].x, 2) - r_2*pow(y-vobstacle[i].y, 2) - r_3*pow(z-vobstacle[i].z, 2));
+  }
+  sum = sum + K_1*(pow(x-xGoal, 2) + pow(y-yGoal, 2) + pow(z-zGoal, 2));
+  return sum;
+}
+
+
+void MotionPlan::RRT::Evaluation(int num){
+  double dx,dy;
+  POINT newP;
+  std::vector<POINT> DigitalPoint;
+  double MaxCost = 0.0;
+  double AveCost = 0.0;
+  double SumCost = 0.0;
+  double CostCurrent, CostOld, CostDiff;
+  double W, Wc = 0.0, Wd = 0.0;
+  double d;
+  double S_sum = 0.0, sigma;
+
+  for(unsigned int i = 0; i < paths.size()-1; i++){
+    dx = paths[i+1].x - paths[i].x;
+    dy = paths[i+1].y - paths[i].y;
+
+    for (int j = 0; j < num; ++j){
+      newP.x = paths[i].x + j * (dx / num);
+      newP.y = paths[i].y + j * (dy / num);
+      DigitalPoint.push_back(newP);
+    }
+  }
+  newP.x = paths[paths.size()-1].x;
+  newP.y = paths[paths.size()-1].y;
+  DigitalPoint.push_back(newP);
+
+  std::ofstream plot("./plot_data/digitaldata.dat");
+  for (unsigned int i = 0; i < DigitalPoint.size(); i++ ){
+    CostCurrent = f_xy(DigitalPoint[i].x, DigitalPoint[i].y, DigitalPoint[i].z);
+    // コストの合計
+    SumCost += CostCurrent;
+    // コストの最大値計算
+    if(CostCurrent > MaxCost){
+      MaxCost = CostCurrent;
+    }
+    // JailletのW(p)
+    if(i > 0){
+      CostDiff = CostCurrent - CostOld;
+      if(CostDiff <= 0){
+        CostDiff = 0;
+      }
+      d = sqrt(pow(DigitalPoint[i].x-DigitalPoint[i-1].x, 2) + pow(DigitalPoint[i].y-DigitalPoint[i-1].y, 2));
+      Wc += CostDiff * d;
+      Wd += d;
+    }
+    plot << DigitalPoint[i].x << "\t" << DigitalPoint[i].y << "\t" << CostCurrent << std::endl;
+    CostOld = CostCurrent;
+  }
+  // JailletのW(p)
+  W = Wc + 0.001 * stepSize * Wd;
+
+  // コストの平均値
+  AveCost = SumCost / DigitalPoint.size();
+
+  // コストの標準偏差
+  for (unsigned int i = 0; i < DigitalPoint.size(); i++ ){
+    S_sum += pow((f_xy(DigitalPoint[i].x, DigitalPoint[i].y, DigitalPoint[i].z) - AveCost),2);
+  }
+  sigma = sqrt(S_sum/DigitalPoint.size());
+
+  // 評価データを保存
+  time_t t = time(NULL);
+  strftime(savefilename, sizeof(savefilename), "./evaluation_data/RRT/Evaluate_20%y.%m.%d_%H:%M:%S.dat", localtime(&t));
+  std::ofstream data(savefilename);
+
+  data << "Length = " << Wd << endl;
+  data << "MaxCost = " << MaxCost << endl;
+  data << "AveCost = " << AveCost << endl;
+  data << "SumCost = " << SumCost << endl;
+  data << "W(p) = " << W << endl;
+  data << "S = " << sigma << endl;
+  data << "Num of Point = " << paths.size() << endl;
+
+  cout << "Length = " << Wd << endl;
+  cout << "MaxCost = " << MaxCost << endl;
+  cout << "AveCost = " << AveCost << endl;
+  cout << "SumCost = " << SumCost << endl;
+  cout << "W(p) = " << W << endl;
+  cout << "S = " << sigma << endl;
+  cout << "Num of Point = " << paths.size() << endl;
+}
 
 
 // Reads initialization info for this RRT from a file with the
@@ -564,6 +680,9 @@ void MotionPlan::RRT::RRTloop(int* iterations, int* nodePath, int* pathLength, s
       std::cout << "Path not found." << std::endl;
     }
   }
+  #ifdef Evaluate
+  Evaluation(1);
+  #endif
   #ifdef Smooth
   smoothing(10000);
   #endif

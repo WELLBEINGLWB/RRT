@@ -4,52 +4,50 @@
 
 namespace MotionPlan
 {
-  /// Checks whether a point (xTest,yTest) is in collision
-  /// with any of the obstacles defined by their min/max coordinates.
-  bool clear(const double* xMin, const double* xMax,
-             const double* yMin, const double* yMax,
-             const double* zMin, const double* zMax,
-             int numObstacles,
-             double xTest, double yTest, double zTest);
-
-  void CreateGridPoint(const double* xMin, const double* xMax,
-                       const double* yMin, const double* yMax,
-                       const double* zMin, const double* zMax, POINT *P, int i);
-
-  void PlaneEquation(POINT p[], int i0[], int i1[], int i2[], int i, double a[]);
-
-  void Pcompare(POINT A, POINT B, POINT *compare);
-
-
-  /// A geometrically exact query for whether the line between
-  /// points (xStart,yStart) and (xDest,yDest) collides with any
-  /// of the obstacles defined by their mein/max coordinates
-  bool link(const double* xMin, const double* xMax,
-            const double* yMin, const double* yMax,
-            const double* zMin, const double* zMax,
-            int numObstacles,
-            double xStart, double yStart, double zStart,
-            double xDest, double yDest, double zDest);
-
-  void CreateGrid(const double xMin, const double xMax,
-                  const double yMin, const double yMax,
-                  const double zMin, const double zMax, POINT *P);
-
-  void PlaneEquation(POINT p[], int i0[], int i1[], int i2[], int i, double a[]);
-
-  void Pcompare(double xStart, double yStart, double zStart,
-                double xDest, double yDest, double zDest, POINT *compare);
-
-  bool Intersection(const double xMin, const double xMax,
-                    const double yMin, const double yMax,
-                    const double zMin, const double zMax,
-                    double xStart, double yStart, double zStart,
-                    double xDest, double yDest, double zDest);
-
-
   class RRT
   {
   public:
+
+    /// Checks whether a point (xTest,yTest) is in collision
+    /// with any of the obstacles defined by their min/max coordinates.
+    bool clear(const double* xMin, const double* xMax,
+               const double* yMin, const double* yMax,
+               const double* zMin, const double* zMax,
+               int numObstacles,
+               double xTest, double yTest, double zTest);
+
+    void CreateGridPoint(const double* xMin, const double* xMax,
+                         const double* yMin, const double* yMax,
+                         const double* zMin, const double* zMax, POINT *P, int i);
+
+    void PlaneEquation(POINT p[], int i0[], int i1[], int i2[], int i, double a[]);
+
+    void Pcompare(POINT A, POINT B, POINT *compare);
+
+
+    /// A geometrically exact query for whether the line between
+    /// points (xStart,yStart) and (xDest,yDest) collides with any
+    /// of the obstacles defined by their mein/max coordinates
+    bool link(const double* xMin, const double* xMax,
+              const double* yMin, const double* yMax,
+              const double* zMin, const double* zMax,
+              int numObstacles,
+              double xStart, double yStart, double zStart,
+              double xDest, double yDest, double zDest);
+
+    void CreateGrid(const double xMin, const double xMax,
+                    const double yMin, const double yMax,
+                    const double zMin, const double zMax, POINT *P);
+
+    void Pcompare(double xStart, double yStart, double zStart,
+                  double xDest, double yDest, double zDest, POINT *compare);
+
+    bool Intersection(const double xMin, const double xMax,
+                      const double yMin, const double yMax,
+                      const double zMin, const double zMax,
+                      double xStart, double yStart, double zStart,
+                      double xDest, double yDest, double zDest);
+
 
     /// Represents a node in an RRT
     /// Stores its own positional information, as well as
@@ -93,6 +91,17 @@ namespace MotionPlan
 
     /// Initializes the RRT as above, except uses data from a file to do so.
     RRT(std::string fileName);
+
+
+    /// ポテンシャル場の定義
+    void CreatePotentialField();
+
+
+    // f(x,y)
+    double f_xy(double x, double y, double z);
+    /// 評価用関数
+    void Evaluation(int num);
+    char savefilename[64] = {'\0'};
 
     /// Destructor
     ~RRT();
@@ -186,6 +195,9 @@ namespace MotionPlan
 
     /// RRTの最終的な経路の座標データ
     std::vector<POINT> paths;
+
+     /// ポテンシャル場を形成するための障害物点を定義するようベクター
+    std::vector<POINT> vobstacle;
 
     /// Maximum number of iterations to run when finding a path
     /// before givin up.

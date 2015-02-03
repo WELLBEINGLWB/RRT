@@ -19,8 +19,15 @@
 
 // #define PlotAnimation
 // #define Bspline
+#define Evaluate
 // #define Smooth
 using namespace std;
+
+#define K 100      // 障害物のポテンシャルの高さ
+#define K_1 1      // 引力のポテンシャルの高さ
+#define r_1 2     // ポテンシャルのx軸方向の大きさ
+#define r_2 2     // ポテンシャルのy軸方向の大きさ
+#define r_3 2     // ポテンシャルのy軸方向の大きさ
 
 typedef struct{
   double x;

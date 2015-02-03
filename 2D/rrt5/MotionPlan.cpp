@@ -178,7 +178,7 @@ MotionPlan::RRT::TreeNode* MotionPlan::RRT::TreeNode::nearestNode(double xSample
 
 
 // f(x,y)
-double MotionPlan::RRT::f_xy(double x,double y)
+double MotionPlan::RRT::f_xy(double x, double y)
 {
   double sum = 0.0;
 

@@ -18,7 +18,8 @@
 #include <unistd.h>
 
 // #define PlotAnimation
-#define Bspline
+// #define Bspline
+// #define Smooth
 using namespace std;
 
 typedef struct{

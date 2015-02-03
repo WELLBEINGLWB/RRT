@@ -91,6 +91,18 @@ void MotionPlan::RRT::CalcCost(int num){
 ```
 * 項目はコストの最大値、平均値、合計、どの指標に関してもT-RRTが勝ち！でも時間はかかっている。でもコストが低いってことは安全な経路を計画しているってこと。
 
+* (2015.2.3) 評価関数`void MotionPlan::RRT::Evaluation(int num)`の設定。これによって、経路の総距離、コストの最大値、平均値、和、w(p)、分散、パスの個数をファイルに出力する。
+
+```cpp
+  cout << "Length = " << Wd << endl;
+  cout << "MaxCost = " << MaxCost << endl;
+  cout << "AveCost = " << AveCost << endl;
+  cout << "SumCost = " << SumCost << endl;
+  cout << "W(p) = " << W << endl;
+  cout << "S = " << sigma << endl;
+  cout << "Num of Point = " << paths.size() << endl;
+```
+
 
 ### rrt_check
 * 単純にrrtがどのようにゴールまで幹を伸ばしていくかっていうのを1ループごとに見るためのプログラム

@@ -19,8 +19,8 @@
 
 // #define Bspline
 // #define PlotAnimation
-// #define Evaluate
-// #define Smooth
+#define Evaluate
+#define Smooth
 
 using namespace std;
 

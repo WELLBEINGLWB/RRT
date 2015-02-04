@@ -41,6 +41,7 @@ int main(int argc, char* argv[])
   gettimeofday(&end, NULL);    // 計測終了時間
   cout << "RRTの実行時間は " << (end.tv_sec - start.tv_sec) + (end.tv_usec - start.tv_usec)*1.0E-6 << "[s]でした。" << endl;
   #ifdef Evaluate
+  rrt.Evaluation(1);
   std::ofstream data(rrt.savefilename, ios::app);
   data << "Time = " << (end.tv_sec - start.tv_sec) + (end.tv_usec - start.tv_usec)*1.0E-6 << "[s]" << endl;
   cout << "評価データは「" << rrt.savefilename << "」に保存されました。" << endl;

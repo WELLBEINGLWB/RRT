@@ -15,8 +15,8 @@ bool MotionPlan::RRT::link(double xStart, double yStart,
                            double xDest, double yDest,
                            double stepSize)
 {
-  double dx = xDest - xStart;
-  double dy = yDest - yStart;
+  double dx   = xDest - xStart;
+  double dy   = yDest - yStart;
   double dist = sqrt(dx * dx + dy * dy);
 
   double CheckX;

@@ -34,11 +34,16 @@ int CountNumbersOfTextLines(string fileName);
 void Input_Data(string fileName);
 
 int main(void){
-  Input_Data("./path.dat"); // 木の幹用ファイル作成（全部）
+  Input_Data("./path.dat");
+  cout << "経路の全体の距離は" << PathDistance(data_num) << endl;
   for (unsigned int i = 0; i < data_num; ++i){
     cout << pathdata[i].x << ", " << pathdata[i].y << endl;
   }
-  Split(5);
+
+  cout << "区切る距離を教えてください >> ";
+  double input;
+  cin >> input;
+  Split(input);
 }
 
 
@@ -46,7 +51,7 @@ void Split(double length)
 {
   int Num = PathDistance(data_num)/length;
   vector< double > D;
-  int flag;
+  int flag = 0;
   double sigma;
   POINT temp;
 
@@ -58,7 +63,7 @@ void Split(double length)
   }
 
   for (int i = 0; i <= Num; ++i){
-    for (unsigned int j = 0; j < D.size(); j++ ){
+    for (unsigned int j = flag; j < D.size(); j++ ){
       if (D[j] <= length*i && length*i < D[j+1]){
         flag = j;
         break;

@@ -643,11 +643,11 @@ void MotionPlan::RRT::RRTloop(int* iterations, int* nodePath, int* pathLength, s
       std::cout << "Path not found." << std::endl;
     }
   }
-  #ifdef Evaluate
-  Evaluation(1);
-  #endif
   #ifdef Smooth
   smoothing(10000);
+  #endif
+  #ifdef Evaluate
+  Evaluation(4);
   #endif
 }
 

@@ -244,7 +244,7 @@ void Evaluate::Eva(){
 
   // 評価データを保存
   time_t t = time(NULL);
-  strftime(savefilename, sizeof(savefilename), "./evaluation_data/Evaluate_20%y.%m.%d_%H:%M:%S.dat", localtime(&t));
+  strftime(savefilename, sizeof(savefilename), "./evaluation_data/T-RRT/Evaluate_20%y.%m.%d_%H:%M:%S.dat", localtime(&t));
   std::ofstream data(savefilename);
   data << "Length = " << PathDistance(data_num) << endl;
   data << "MaxCost = " << MaxCost << endl;

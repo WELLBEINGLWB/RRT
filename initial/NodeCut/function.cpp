@@ -259,7 +259,7 @@ void Evaluate::Eva(){
   cout << "AveCost = " << AveCost << endl;
   cout << "SumCost = " << SumCost << endl;
   cout << "W(p) = " << W << endl;
-  cout << "Wc = " << Wc << endl;
+  // cout << "Wc = " << Wc << endl;
   cout << "S = " << sigma << endl;
   // cout << "Num of Point = " << paths.size() << endl;
 }

@@ -20,7 +20,7 @@
 // #define PlotAnimation
 // #define APF
 // #define Bspline
-#define Evaluate
+// #define Evaluate
 #define Smooth
 
 #define K 1             // 障害物のポテンシャルの高さ

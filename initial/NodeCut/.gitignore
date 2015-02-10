@@ -7,4 +7,5 @@ evaluation_data/
 /cmake_install.cmake
 w
 plot.plt
-obstacle.dat
+*.dat
+!testcase1.dat

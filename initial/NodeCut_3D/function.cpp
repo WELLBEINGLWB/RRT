@@ -313,6 +313,7 @@ void Evaluate::output_plt(string plt_output, char* argv[]){
   plt << "set key outside" << endl;
   plt << "set key top right" << endl;
 
+  plt << "set ticslevel 0" << endl;
   plt << "set size square" << endl;
   plt << "splot \"Cut_Node.dat\" using 1:2:3 with points pt 7 ps 0.78 lt rgb \"#ff9900\" title \"cut node\",\\" << endl;
   plt << "\"" << string(argv[1]) << "\" using 1:2:3 with lines lt 1 lc rgb \"#696969\" lw 1 title \"path\",\\" << endl;

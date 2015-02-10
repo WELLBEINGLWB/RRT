@@ -1,0 +1,10 @@
+*~
+*.DS_Store
+CMakeFiles/
+evaluation_data/
+/CMakeCache.txt
+/Makefile
+/cmake_install.cmake
+w
+plot.plt
+obstacle.dat

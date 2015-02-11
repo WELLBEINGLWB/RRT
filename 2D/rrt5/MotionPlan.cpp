@@ -635,7 +635,7 @@ void MotionPlan::RRT::RRTloop(int* iterations, int* nodePath, int* pathLength, s
   #ifdef Smooth
   smoothing(10000);
   #else
-  // cout << "パスの総数は" << paths.size() << endl;
+  cout << "パスの総数は" << paths.size() << endl;
   #endif
 }
 

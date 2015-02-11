@@ -268,7 +268,7 @@ void Evaluate::Eva(){
   cout << "SumCost = " << SumCost << endl;
   cout << "W(p) = " << W << endl;
   cout << "S = " << sigma << endl;
-  cout << "Num of Point = " << pathdata.size() << endl;
+  cout << "Num of Point = " << node.size() << endl;
 
   // cout << PathDistance(data_num) << endl;
   // cout << MaxCost << endl;

@@ -261,7 +261,6 @@ void Evaluate::Eva(){
   cout << "W(p) = " << W << endl;
   // cout << "Wc = " << Wc << endl;
   cout << "S = " << sigma << endl;
-  // cout << "Num of Point = " << paths.size() << endl;
 }
 
 void Evaluate::CreateCube(string obstacle_output)

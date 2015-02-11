@@ -19,8 +19,8 @@
 
 // #define PlotAnimation
 // #define Bspline
-#define Evaluate
-// #define Smooth
+// #define Evaluate
+#define Smooth
 using namespace std;
 
 #define K 100      // 障害物のポテンシャルの高さ

@@ -126,8 +126,10 @@ void Evaluate::CreatePotentialField()
   for (int i = 0; i < numObstacles; ++i) {
     for (double x = xMin[i]; x <= xMax[i]; ++x) {
       for(double y = yMin[i]; y <= yMax[i]; ++y){
-        tmp.x = x; tmp.y = y;
-        obstacle.push_back(tmp);
+        for(double z = zMin[i]; z <= zMax[i]; ++z){
+          tmp.x = x; tmp.y = y; tmp.z = z;
+          obstacle.push_back(tmp);
+        }
       }
     }
   }
@@ -203,7 +205,7 @@ void Evaluate::Split()
 
   std::ofstream pathData("./data/Cut_Node.dat");
   for(unsigned int i = 0; i < node.size(); i++ ){
-    pathData << node[i].x << "\t" << node[i].y << "\t" << node[i].z << endl;
+    pathData << node[i].x << "\t" << node[i].y << "\t" << node[i].z << "\t" << f_xy(node[i].x, node[i].y, node[i].z) << endl;
   }
   pathData << xGoal << "\t" << yGoal << "\t" << zGoal << endl;
 }
@@ -260,13 +262,19 @@ void Evaluate::Eva(){
   data << "S = " << sigma << endl;
   // data << "Num of Point = " << paths.size() << endl;
 
-  cout << "Length = " << PathDistance(data_num) << endl;
-  cout << "MaxCost = " << MaxCost << endl;
-  cout << "AveCost = " << AveCost << endl;
-  cout << "SumCost = " << SumCost << endl;
-  cout << "W(p) = " << W << endl;
-  cout << "Wc = " << Wc << endl;
-  cout << "S = " << sigma << endl;
+  // cout << "Length = " << PathDistance(data_num) << endl;
+  // cout << "MaxCost = " << MaxCost << endl;
+  // cout << "AveCost = " << AveCost << endl;
+  // cout << "SumCost = " << SumCost << endl;
+  // cout << "W(p) = " << W << endl;
+  // cout << "S = " << sigma << endl;
+
+  cout << PathDistance(data_num) << endl;
+  cout << MaxCost << endl;
+  cout << AveCost << endl;
+  cout << SumCost << endl;
+  cout << W << endl;
+  cout << sigma << endl;
   // cout << "Num of Point = " << paths.size() << endl;
 }
 

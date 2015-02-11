@@ -1,5 +1,5 @@
-set terminal postscript eps color enhanced 20
-set output "out.eps"
+#set terminal postscript eps color enhanced 20
+#set output "out.eps"
 set xrange [0:22]
 set yrange [0:22]
 set zrange [0:22]

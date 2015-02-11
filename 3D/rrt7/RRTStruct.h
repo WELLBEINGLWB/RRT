@@ -20,8 +20,8 @@
 // #define PlotAnimation
 // #define APF
 // #define Bspline
-#define Evaluate
-// #define Smooth
+// #define Evaluate
+#define Smooth
 
 #define K 100        // 障害物のポテンシャルの高さ
 // #define K 60        // （以前の）障害物のポテンシャルの高さ

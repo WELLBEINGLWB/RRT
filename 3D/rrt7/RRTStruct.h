@@ -19,7 +19,7 @@
 
 // #define PlotAnimation
 // #define APF
-// #define Bspline
+#define Bspline
 // #define Evaluate
 #define Smooth
 

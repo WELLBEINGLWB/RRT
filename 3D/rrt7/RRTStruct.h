@@ -18,7 +18,7 @@
 #include <unistd.h>
 
 // #define PlotAnimation
-// #define Bspline
+#define Bspline
 // #define Evaluate
 #define Smooth
 using namespace std;

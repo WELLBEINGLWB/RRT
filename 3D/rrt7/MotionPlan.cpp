@@ -689,7 +689,7 @@ void MotionPlan::RRT::RRTloop(int* iterations, int* nodePath, int* pathLength, s
 
       std::ofstream pathData("./plot_data/path_data.dat", std::ios_base::trunc);
       for(unsigned int addpath = 0; addpath < paths.size(); addpath++ ){
-        pathData << paths[addpath].x << "\t" << paths[addpath].y << "\t" << paths[addpath].z << std::endl;
+        pathData << paths[addpath].x/10.0 << "\t" << paths[addpath].y/10.0 << "\t" << paths[addpath].z/10.0 << std::endl;
       }
       break;
 
@@ -783,7 +783,7 @@ void MotionPlan::RRT::smoothing(int loop)
 
       std::ofstream outStream("./plot_data/path_data_mod.dat", std::ios_base::trunc);
       for (unsigned int k = 0; k < paths.size(); k++) {
-        outStream << paths[k].x << "\t" << paths[k].y << "\t" << paths[k].z << std::endl;
+        outStream << paths[k].x/10.0 << "\t" << paths[k].y/10.0 << "\t" << paths[k].z/10.0 << std::endl;
       }
 
       #ifdef PlotAnimation
@@ -875,8 +875,8 @@ void MotionPlan::RRT::outputTree(std::ostream &outStream)
 {
   //ノードの座標を2点ずつのブロックでファイルに書き込み
   for (unsigned int i = 0; i < edges.size(); ++i){
-    outStream << (nodes[edges[i].node1])->x << "\t" << (nodes[edges[i].node1])->y << "\t" << (nodes[edges[i].node1])->z << std::endl;
-    outStream << (nodes[edges[i].node2])->x << "\t" << (nodes[edges[i].node2])->y << "\t" << (nodes[edges[i].node2])->z << std::endl;
+    outStream << (nodes[edges[i].node1])->x/10.0 << "\t" << (nodes[edges[i].node1])->y/10.0 << "\t" << (nodes[edges[i].node1])->z/10.0 << std::endl;
+    outStream << (nodes[edges[i].node2])->x/10.0 << "\t" << (nodes[edges[i].node2])->y/10.0 << "\t" << (nodes[edges[i].node2])->z/10.0 << std::endl;
     outStream << "\n" << std::endl;
 
     #ifdef PlotAnimation

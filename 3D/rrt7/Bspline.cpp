@@ -138,7 +138,7 @@ void Draw::drowSpline(std::vector<POINT> &finalpath)
     }
 
     SplinePoint.push_back(tmp);
-    outStream << tmp.x << "\t" << tmp.y << "\t" << tmp.z << std::endl;
+    outStream << tmp.x/10.0 << "\t" << tmp.y/10.0 << "\t" << tmp.z/10.0 << std::endl;
     // outdata << tmp.x << "\t" << tmp.y << "\t" << tmp.z << "\t" << f_xyz(tmp.x, tmp.y, tmp.z) << std::endl;
 
     #ifdef PlotAnimation

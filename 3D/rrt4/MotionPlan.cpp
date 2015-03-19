@@ -229,19 +229,20 @@ MotionPlan::RRT::RRT(std::string fileName):
 
 
 
-// Reads initialization info for this RRT from a file with the
-// following format:
-// xLeft
-// xRight
-// yBottom
-// yTop
-// numObstacles
-// xMin1 xMax1 yMin1 yMax1
+// 障害物ファイルを以下のフォーマットにしたがって読み込ませる
+// xLeft                   探索を行う空間のxの最小値
+// xRight                  探索を行う空間のxの最大値
+// yBottom                 探索を行う空間のyの最小値
+// yTop                    探索を行う空間のyの最大値
+// zBottom                 探索を行う空間のzの最小値
+// zTop                    探索を行う空間のzの最大値
+// numObstacles            障害物の数
+// xMin1 xMax1 yMin1 yMax1 1個目の障害物のxの最小値，最大値，yの最小値，最大値
 // ...
-// xMinN xMaxN yMinN yMaxN
-// xStart yStart
-// xGoal yGoal
-// Stepsize
+// xMinN xMaxN yMinN yMaxN N個目の障害物のxの最小値，最大値，yの最小値，最大値
+// xStart yStart zStart    探索の開始座標
+// xGoal yGoal zGoal       探索の目標座標
+// Stepsize                1ループで伸ばす枝の長さ
 void MotionPlan::RRT::initFromFile(std::string fileName)
 {
   if (xMin != NULL)
@@ -320,11 +321,7 @@ MotionPlan::RRT::~RRT()
 
 
 
-// For x and y, generates a random number, scales it to [0,1], then
-// scales it to the distance between the boundaries, then offsets it
-// by the left/bottom value. This effectively generates x and y values
-// in [xLeft, xRight] and [yBottom, yTop], respectively. We continue
-// generating points until we find one that is clear of all obstacles.
+// 定義した探索空間においてランダムに一点をサンプリングする
 void MotionPlan::RRT::randFreeSample(double* x, double* y, double* z)
 {
   do{
@@ -336,7 +333,7 @@ void MotionPlan::RRT::randFreeSample(double* x, double* y, double* z)
 
 
 
-// Recurses through the RRT, calling nearestNode() on each node.
+// 最も近いノードを探索
 MotionPlan::RRT::TreeNode* MotionPlan::RRT::nearestNode(double x, double y, double z)
 {
   TreeNode* nearest = NULL;
@@ -349,10 +346,7 @@ MotionPlan::RRT::TreeNode* MotionPlan::RRT::nearestNode(double x, double y, doub
 
 
 
-// Finds the vector from the nearest node to the sample point (x,y),
-// normalizes it, and then scales it by stepSize to get our new point to add
-// to the tree, given that link() between the nearest node and the new node
-// does not fail.
+// nearest nodeからサンプルポイントに伸ばすかどうかの判定
 MotionPlan::RRT::TreeNode* MotionPlan::RRT::genNewNode(const TreeNode* nearest, double x, double y, double z)
 {
   double dx = x - nearest->x;
@@ -381,10 +375,7 @@ MotionPlan::RRT::TreeNode* MotionPlan::RRT::genNewNode(const TreeNode* nearest, 
 
 
 
-// Checks if the square of the distance between this node and
-// the goal position is within the square of the stepSize. If so,
-// check link() between the two positions. Return true if link()
-// passes; false if not.
+// ゴールに到達しているかどうかの判定
 bool MotionPlan::RRT::checkGoal(const TreeNode* checkNode)
 {
   double dx = xGoal - checkNode->x;
@@ -400,21 +391,7 @@ bool MotionPlan::RRT::checkGoal(const TreeNode* checkNode)
 
 
 
-// First clears the tree of any info that may have been left over
-// from a previous pathfind.
-// While a path to the goal hasn't been found and we haven't iterated
-// more than MAX_ITERATIONS:
-// Generate a random sample, find the nearest node to that sample,
-// attempt to make a new node stepSize away from the nearest node in the
-// direction of the random sample, and if that works, add it to the tree
-// and check if it's close enough to the goal to try a link() to it. If
-// the goal has been reached, add a new node to the tree that represents
-// the goal position.
-// If the goal was added to the tree, find the path to it by starting at
-// the goal and building a path backwards through its parents. Reverse this
-// list, and you have the path.
-// If the goal was never added to the tree, return false.
-
+// 経路を探索する
 bool MotionPlan::RRT::findPath(int* iterations, int* nodePath, int* pathLength)
 {
 
@@ -480,15 +457,7 @@ bool MotionPlan::RRT::findPath(int* iterations, int* nodePath, int* pathLength)
       }
     }
 
-    // while(1){
-    //   std::string a;
-    //   std::cout << (*iterations) << "ループに進む場合は「y」を入力"<< std::endl;
-    //   std::cin >> a;
-    //   if( a == "y" ) break;
-    // }
-
-
-  } // end while goal hasn't been reached
+  } // ゴールに到達するまでループを繰り返す
 
   std::cout << "iterations = " << (*iterations) << " Finished" << std::endl;
 

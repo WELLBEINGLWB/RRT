@@ -43,10 +43,6 @@ int main(int argc, char* argv[])
     }
   }
 
-  // file << "Average Comp. time: " << (itersSum / 20.0) << " iterations" << std::endl;
-  // file << "Average # of nodes: " << (nodeSum / 20.0) << std::endl;
-  // file << "Average path length: " << (pathSum / 20.0) << std::endl;
-
   file.close();
   path_file.close();
   obstacle.close();

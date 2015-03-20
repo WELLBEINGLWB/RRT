@@ -391,7 +391,7 @@ bool MotionPlan::RRT::checkGoal(const TreeNode* checkNode)
 
 
 
-// 経路を探索する
+// RRTで経路を探索するメイン関数
 bool MotionPlan::RRT::findPath(int* iterations, int* nodePath, int* pathLength)
 {
 

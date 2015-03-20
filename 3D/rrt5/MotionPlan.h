@@ -30,26 +30,27 @@ typedef struct {
 
 namespace MotionPlan
 {
-  /// Checks whether a point (xTest,yTest) is in collision
-  /// with any of the obstacles defined by their min/max coordinates.
+
+  // 対象の点が障害物に衝突していないかを判定
   bool clear(const double* xMin, const double* xMax,
              const double* yMin, const double* yMax,
              const double* zMin, const double* zMax,
              int numObstacles,
              double xTest, double yTest, double zTest);
 
+  // 障害物の各頂点を抽出
   void CreateGridPoint(const double* xMin, const double* xMax,
                        const double* yMin, const double* yMax,
                        const double* zMin, const double* zMax, POINT *P, int i);
 
+  // 平面の方程式を導出
   void PlaneEquation(POINT p[], int i0[], int i1[], int i2[], int i, double a[]);
 
+  // 与えられた2点の各座標値の大きさを比較
   void Pcompare(POINT A, POINT B, POINT *compare);
 
 
-  /// A geometrically exact query for whether the line between
-  /// points (xStart,yStart) and (xDest,yDest) collides with any
-  /// of the obstacles defined by their mein/max coordinates
+  // (xStart,yStart,zStart) と (xDest,yDest,zDest) を結ぶ直線と障害物が干渉しているか判定
   bool link(const double* xMin, const double* xMax,
             const double* yMin, const double* yMax,
             const double* zMin, const double* zMax,
@@ -77,9 +78,6 @@ namespace MotionPlan
   {
   public:
 
-    /// Represents a node in an RRT
-    /// Stores its own positional information, as well as
-    /// a list of its children and a pointer to its parent
     class TreeNode
     {
     public:

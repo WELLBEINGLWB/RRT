@@ -51,12 +51,14 @@ void MotionPlan::RRT::randFreeSample(double* x, double* y)
 }
 ```
 * 経路の洗練を行うアルゴリズムの追加（HCフィルタ）
+
 ```cpp
   void RRTloop(int* iterations, int* nodePath, int* pathLength, std::ostream& nodeData);
   int GetRandom(double min, double max);
   double Distance();
   void smoothing(int loop);
 ```
+
 * 最終的に`RRTloop(int* iterations, int* nodePath, int* pathLength, std::ostream& nodeData)`に全部の関数を入れるようにして、main文をスマートに
 * 障害物が動いても対応できるようなものも多少作っている。ロボットアームがどこまで動いているかっていうのが全く定義しきれていないから、実際には使えない。
 
@@ -136,8 +138,8 @@ void MotionPlan::RRT::randFreeSample(double* x, double* y)
                     const double zMin, const double zMax,
                     double xStart, double yStart, double zStart,
                     double xDest, double yDest, double zDest);
-
 ```
+
 * まだこの時にはランダムサンプリングの改良ができていなかったので、局所解に陥りがち
 * ループ回数も多め  
 ![rrt3d](https://dl.dropboxusercontent.com/u/23873125/Markdown/rrt3d.jpg)
@@ -145,7 +147,9 @@ void MotionPlan::RRT::randFreeSample(double* x, double* y)
 ### rrt5
 * かなりマイナーアップデート
 * rrt4でのは実装できていなかったランダムサンプリングのくだりを盛り込んだだけじゃないかな  
+
 ![rrt3dmod](https://dl.dropboxusercontent.com/u/23873125/Markdown/rrt3d_mod2.jpg)
+
 ```cpp
   roulette = (((double)rand())/RAND_MAX)*100;
   if(roulette >= 90){

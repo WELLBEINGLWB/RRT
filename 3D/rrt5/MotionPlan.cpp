@@ -224,6 +224,8 @@ MotionPlan::RRT::RRT(std::string fileName):
                      zMin(NULL), zMax(NULL)
 {
   initFromFile(fileName);
+  std::ofstream file("./plot_data/testcase1_obstacle.dat");
+  CreateCube(file);
   srand((unsigned int)time(NULL));
 }
 
@@ -485,6 +487,37 @@ bool MotionPlan::RRT::findPath(int* iterations, int* nodePath, int* pathLength)
     nodePath = NULL;
     return false;
   }
+}
+
+
+
+void MotionPlan::RRT::RRTloop(int* iterations, int* nodePath, int* pathLength, std::ostream& nodeData)
+{
+  std::string a;
+  POINT tmp;
+
+  while(1){
+    if (findPath(iterations, nodePath, pathLength)) {
+      outputTree(nodeData);
+
+      for (int i = 0; i < (*pathLength); ++i) {
+        tmp.x = (nodes[nodePath[i]])->x;
+        tmp.y = (nodes[nodePath[i]])->y;
+        tmp.z = (nodes[nodePath[i]])->z;
+        paths.push_back(tmp);
+      }
+
+      std::ofstream pathData("./plot_data/path_data.dat", std::ios_base::trunc);
+      for(unsigned int addpath = 0; addpath < paths.size(); addpath++ ){
+        pathData << paths[addpath].x << "\t" << paths[addpath].y << "\t" << paths[addpath].z << std::endl;
+      }
+      break;
+
+    } else {
+      std::cout << "Path not found." << std::endl;
+    }
+  }
+  std::cout << "ノードの個数" << paths.size() << std::endl;
 }
 
 

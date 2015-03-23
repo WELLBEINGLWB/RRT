@@ -1,6 +1,6 @@
-set xrange [0:22]
-set yrange [0:22]
-set zrange [0:22]
+set xrange [0:15.6]
+set yrange [0:11.6]
+set zrange [0:10.6]
 
 set xlabel "x"
 set ylabel "y"
